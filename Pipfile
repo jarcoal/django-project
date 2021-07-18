@@ -38,14 +38,16 @@ stripe = "*"
 whitenoise = "*"
 
 [dev-packages]
-attrs = "*"  # black wants this but doens't include it as a dep
-black = "*"
 dj-inmemorystorage = "*"
 factory-boy = "*"
 flake8 = "*"
 flake8-django = "*"
 freezegun = "*"
 httmock = "*"
+black = "*"
 
 [requires]
 python_version = "3.9"
+
+[pipenv]
+allow_prereleases = true
