@@ -104,6 +104,10 @@ WSGI_APPLICATION = "app.wsgi.application"
 DATABASES = {"default": env.db()}
 
 
+# User Model
+AUTH_USER_MODEL = "app.User"
+
+
 # Cache
 # https://docs.djangoproject.com/en/3.2/ref/settings/#caches
 CACHES = {"default": env.cache("REDIS_URL")}
