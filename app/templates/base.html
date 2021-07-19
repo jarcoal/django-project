@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="{{LANGUAGE_CODE}}">
+  <head>
+    <meta charset="utf-8" />
+    <title>{% block title %}{% endblock %}</title>
+
+    <meta
+      name="description"
+      content="{% block meta_description %}{% endblock %}"
+    />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta
+      property="og:title"
+      content="{% block meta_og_title %}{% endblock %}"
+    />
+
+    <meta property="og:type" content="{% block meta_og_type %}{% endblock %}" />
+
+    <meta property="og:url" content="{% block meta_og_url %}{% endblock %}" />
+
+    <meta
+      property="og:image"
+      content="{% block meta_og_image %}{% endblock %}"
+    />
+
+    <link rel="apple-touch-icon" href="icon.png" />
+
+    <meta name="theme-color" content="#fafafa" />
+  </head>
+
+  <body>
+    {% block body %}{% endblock %}
+  </body>
+</html>

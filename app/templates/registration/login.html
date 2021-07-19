@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Login" %}{% endblock %}
+
+{% block body %}
+<form method="post">
+  {% if request.limited %}{% trans "Rate Limited!" %}{% endif %}
+  
+  {{form}}
+
+  <button type="submit">{% trans "Login" %}</button>
+  {% csrf_token %}
+</form>
+{% endblock %}
