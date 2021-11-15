@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 "psycopg2-binary" = "*"
 celery = "*"
-dj-database-url = "*"
 django = "*"
 django-anymail = {version = "*",extras = ["postmark"]}
 django-celery-beat = "*"
