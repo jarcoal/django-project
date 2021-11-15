@@ -152,6 +152,12 @@ AUTH_USER_MODEL = "app.User"
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/login/redirect/"
 
+# URL of the post-login dashboard.  We use this for our OAuth2 application
+OAUTH2_APPLICATION_NAME = env("OAUTH2_APPLICATION_NAME", default="Dashboard")
+OAUTH2_APPLICATION_REDIRECT_URI = env(
+    "OAUTH2_APPLICATION_REDIRECT_URI", default="/dashboard/"
+)
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
