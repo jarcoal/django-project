@@ -7,7 +7,8 @@ from rest_framework.test import APIClient
         "default": {
             "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         },
-    }
+    },
+    CELERY_BROKER_URL="memory://localhost/",
 )
 class TestCase(DjangoTestCase):
     """Abstract TestCase class to be used in test suite."""
