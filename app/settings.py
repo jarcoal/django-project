@@ -225,7 +225,7 @@ LOGGING = {
     },
     "formatters": {
         "json": {
-            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+            "()": "app.utils.log.JsonFormatter",
         }
     },
     "handlers": {
