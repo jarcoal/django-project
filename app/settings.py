@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "django_otp",
     "django_otp.plugins.otp_totp",
+    "django_otp.plugins.otp_hotp",
     "django_otp.plugins.otp_static",
     "rest_framework",
     "corsheaders",
@@ -75,6 +76,7 @@ MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_otp.middleware.OTPMiddleware",
 ]
 
 ROOT_URLCONF = "app.urls"
@@ -158,6 +160,7 @@ OAUTH2_APPLICATION_REDIRECT_URI = env(
     "OAUTH2_APPLICATION_REDIRECT_URI", default="/dashboard/"
 )
 
+OTP_TOTP_ISSUER = "Django app"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
