@@ -37,6 +37,7 @@ ENVIRONMENT = env("ENVIRONMENT")
 
 ALLOWED_HOSTS = []
 
+SITE_ID = 1
 
 # Application definition
 
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
     # Us
     "app",
     # 3rd Party
@@ -55,6 +57,11 @@ INSTALLED_APPS = [
     "django_otp.plugins.otp_totp",
     "django_otp.plugins.otp_hotp",
     "django_otp.plugins.otp_static",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.microsoft",
     "rest_framework",
     "corsheaders",
     "anymail",
@@ -105,14 +112,50 @@ WSGI_APPLICATION = "app.wsgi.application"
 
 DATABASES = {"default": env.db()}
 
-
-# User Model
-AUTH_USER_MODEL = "app.User"
-
-
 # Cache
 # https://docs.djangoproject.com/en/3.2/ref/settings/#caches
 CACHES = {"default": env.cache("REDIS_URL")}
+
+# Internationalization
+# https://docs.djangoproject.com/en/3.2/topics/i18n/
+
+LANGUAGE_CODE = "en-us"
+
+TIME_ZONE = "UTC"
+
+USE_I18N = True
+
+USE_L10N = True
+
+USE_TZ = True
+
+# Auth
+
+AUTH_USER_MODEL = "app.User"
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
+
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+# OAuth2 Toolkit
+OAUTH2_PROVIDER = {
+    "ACCESS_TOKEN_EXPIRE_SECONDS": 86400 * 365,
+}
+
+# URL of the post-login dashboard.  We use this for our OAuth2 application
+OAUTH2_APPLICATION_NAME = env("OAUTH2_APPLICATION_NAME", default="Dashboard")
+OAUTH2_APPLICATION_REDIRECT_URI = env(
+    "OAUTH2_APPLICATION_REDIRECT_URI", default="/dashboard/"
+)
+
+OTP_TOTP_ISSUER = "Django app"
 
 
 # Password validation
@@ -134,33 +177,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/3.2/topics/i18n/
-
-LANGUAGE_CODE = "en-us"
-
-TIME_ZONE = "UTC"
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
-
-
-# Custom user model
-AUTH_USER_MODEL = "app.User"
-
-LOGIN_URL = "/login/"
-LOGIN_REDIRECT_URL = "/login/redirect/"
-
-# URL of the post-login dashboard.  We use this for our OAuth2 application
-OAUTH2_APPLICATION_NAME = env("OAUTH2_APPLICATION_NAME", default="Dashboard")
-OAUTH2_APPLICATION_REDIRECT_URI = env(
-    "OAUTH2_APPLICATION_REDIRECT_URI", default="/dashboard/"
-)
-
-OTP_TOTP_ISSUER = "Django app"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
@@ -170,12 +186,6 @@ STATIC_URL = "/static/"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
-# OAuth2 Toolkit
-OAUTH2_PROVIDER = {
-    "ACCESS_TOKEN_EXPIRE_SECONDS": 86400 * 365,
-}
 
 # Configure Anymail
 ANYMAIL = {

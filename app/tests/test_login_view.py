@@ -2,13 +2,14 @@ from django.conf import settings
 
 from .factories import UserFactory
 from .test_case import TestCase
-from app.views import LoginView
 from app.models import User
+from django.urls import reverse_lazy
+from allauth.account.views import LoginView
 
 
 class LoginViewTests(TestCase):
     MOCK_PASSWORD = "MOCK_PASSWORD"
-    VIEW_URL = settings.LOGIN_URL
+    VIEW_URL = reverse_lazy("account_login")
 
     @classmethod
     def setUpTestData(cls):
@@ -16,7 +17,7 @@ class LoginViewTests(TestCase):
         cls.user.set_password(cls.MOCK_PASSWORD)
         cls.user.save(update_fields=["password"])
 
-    def check_get(self):
+    def test_get(self):
         """Make sure that we can fetch the login page"""
 
         # Fetch the login page
@@ -32,7 +33,7 @@ class LoginViewTests(TestCase):
         resp = self.client.post(
             self.VIEW_URL,
             {
-                "username": self.user.email,
+                "login": self.user.email,
                 "password": self.MOCK_PASSWORD,
             },
         )
@@ -49,7 +50,7 @@ class LoginViewTests(TestCase):
         resp = self.client.post(
             self.VIEW_URL,
             {
-                "username": self.user.email,
+                "login": self.user.email,
                 "password": "invalidpass",
             },
         )
@@ -62,6 +63,5 @@ class LoginViewTests(TestCase):
             resp,
             "form",
             None,
-            LoginView.form_class.error_messages["invalid_login"]
-            % {"username": User.USERNAME_FIELD},
+            LoginView.form_class.error_messages["email_password_mismatch"],
         )
