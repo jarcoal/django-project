@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import environ
+from urllib.parse import urlencode
 from pathlib import Path
 
 
@@ -157,6 +158,18 @@ OAUTH2_APPLICATION_REDIRECT_URI = env(
 
 OTP_TOTP_ISSUER = "Django app"
 
+DASHBOARD_URL = env("DASHBOARD_URL")
+DASHBOARD_CLIENT_ID = env("DASHBOARD_CLIENT_ID")
+
+LOGIN_REDIRECT_URL = "/oauth/authorize/?" + urlencode(
+    {
+        "client_id": DASHBOARD_CLIENT_ID,
+        "redirect_uri": DASHBOARD_URL,
+        "grant_type": "authorization_code",
+        "response_type": "token",
+        "scope": "read write",
+    }
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
