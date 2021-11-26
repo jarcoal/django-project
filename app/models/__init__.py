@@ -1,4 +1,4 @@
 from .user import User
 
 
-__ALL__ = ("User",)
+__all__ = ("User",)
