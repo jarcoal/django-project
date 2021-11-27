@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 "psycopg2-binary" = "*"
+attrs = "*"
 celery = "*"
 django = "*"
 django-allauth = "*"
@@ -38,13 +39,13 @@ stripe = "*"
 whitenoise = "*"
 
 [dev-packages]
+black = "*"
 dj-inmemorystorage = "*"
 factory-boy = "*"
 flake8 = "*"
 flake8-django = "*"
 freezegun = "*"
 httmock = "*"
-black = "*"
 
 [requires]
 python_version = "3.9"
