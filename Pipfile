@@ -29,12 +29,12 @@ django-webpack-loader = "*"
 djangorestframework = "*"
 drf-extra-fields = "*"
 gunicorn = "*"
+httpx = "*"
 newrelic = "*"
 premailer = "*"
 pyjwt = "*"
 python-json-logger = "*"
 redis="*"
-requests = "*"
 stripe = "*"
 whitenoise = "*"
 
@@ -45,10 +45,7 @@ factory-boy = "*"
 flake8 = "*"
 flake8-django = "*"
 freezegun = "*"
-httmock = "*"
+respx = "*"
 
 [requires]
-python_version = "3.9"
-
-[pipenv]
-allow_prereleases = true
+python_version = "3.10"
