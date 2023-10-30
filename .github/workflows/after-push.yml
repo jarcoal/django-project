@@ -25,7 +25,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres/postgres:16-alpine
+        image: postgres:16-alpine
         env:
           # Don't require authentication
           POSTGRES_HOST_AUTH_METHOD: trust
