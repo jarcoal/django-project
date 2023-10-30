@@ -14,7 +14,7 @@ env:
   DATABASE_URL: postgis://postgres@localhost/postgres
   RECAPTCHA_PRIVATE_KEY: RECAPTCHA_PRIVATE_KEY
   RECAPTCHA_PUBLIC_KEY: RECAPTCHA_PUBLIC_KEY
-  REDIS_URL: localhost:6379
+  REDIS_URL: redis://localhost:6379
   SECRET_KEY: SECRET_KEY
 
 jobs:
