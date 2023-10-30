@@ -2,9 +2,9 @@ name: App
 
 on:
   push:
-    branches: [master, production]
+    branches: [main, production]
   pull_request:
-    branches: [master, production]
+    branches: [main, production]
 
 env:
   AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
