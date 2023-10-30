@@ -9,7 +9,7 @@ attrs = "*"
 celery = "*"
 django = "*"
 django-allauth = "*"
-django-anymail = {version = "*",extras = ["postmark"]}
+django-anymail = {version = "*",extras = ["amazon-ses"]}
 django-celery-beat = "*"
 django-celery-results = "*"
 django-cors-headers = "*"

@@ -201,10 +201,11 @@ STATIC_URL = "/static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Configure Anymail
-ANYMAIL = {
-    "POSTMARK_SERVER_TOKEN": env("POSTMARK_API_KEY"),
-}
+# Configure Email
+
+EMAIL_BACKEND = "anymail.backends.amazon_ses.EmailBackend"
+
+ANYMAIL = {}
 
 # Celery
 
