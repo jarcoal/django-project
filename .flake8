@@ -1,0 +1,9 @@
+[flake8]
+exclude = .git,*migrations*,*/docs/*,*/.tox/*,*/.venv/*,__pycache__, */*/__init__.py
+max-line-length = 88
+
+# DJ01 forbids null textfield
+# DJ08 requires all models to have __str__ methods
+# W503 forbids line breaks before binary operators
+# E203 and E231 don't work with black
+ignore = DJ01,DJ08,W503,E203,E231
