@@ -38,7 +38,6 @@ def delete_oauth2_application(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("app", "0001_initial"),
         ("oauth2_provider", "0001_initial"),
