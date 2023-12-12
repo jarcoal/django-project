@@ -72,7 +72,7 @@ INSTALLED_APPS = [
     "safedelete",
     "oauth2_provider",  # make sure this comes after "app" so we can override templates
     "webpack_loader",
-    "captcha",
+    "django_captcha",
 ]
 
 MIDDLEWARE = [
