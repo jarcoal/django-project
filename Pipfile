@@ -35,6 +35,7 @@ premailer = "*"
 pyjwt = "*"
 python-json-logger = "*"
 redis="*"
+setuptools="*"
 stripe = "*"
 whitenoise = "*"
 
