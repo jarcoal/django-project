@@ -10,10 +10,6 @@ from rest_framework.test import APIClient
         },
     },
     CELERY_BROKER_URL="memory://localhost/",
-    DEBUG_TOOLBAR_CONFIG={
-        "SHOW_TOOLBAR_CALLBACK": lambda _: False,
-        "IS_RUNNING_TESTS": False,
-    },
 )
 class TestCase(DjangoTestCase):
     """Abstract TestCase class to be used in test suite."""
