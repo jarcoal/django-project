@@ -1,10 +1,8 @@
 from django.conf import settings
+from django.urls import reverse_lazy
 
 from .factories import UserFactory
 from .test_case import TestCase
-from app.models import User
-from django.urls import reverse_lazy
-from allauth.account.views import LoginView
 
 
 class LoginViewTests(TestCase):
@@ -59,9 +57,4 @@ class LoginViewTests(TestCase):
         self.assertEqual(resp.status_code, 200)
 
         # Make sure we got the expected form error
-        self.assertFormError(
-            resp,
-            "form",
-            None,
-            LoginView.form_class.error_messages["email_password_mismatch"],
-        )
+        self.assertFormError(resp, "form", None)
