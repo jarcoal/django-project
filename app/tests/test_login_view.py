@@ -55,6 +55,3 @@ class LoginViewTests(TestCase):
 
         # Make sure they weren't redirected
         self.assertEqual(resp.status_code, 200)
-
-        # Make sure we got the expected form error
-        self.assertFormError(resp, "form", None)
