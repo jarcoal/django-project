@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import sys
 from pathlib import Path
 from urllib.parse import urlencode
 
@@ -36,6 +37,8 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG")
 ENVIRONMENT = env("ENVIRONMENT")
 
+TESTING = "test" in sys.argv
+
 ALLOWED_HOSTS = []
 
 SITE_ID = 1
@@ -53,7 +56,6 @@ INSTALLED_APPS = [
     # Us
     "app",
     # 3rd Party
-    "debug_toolbar",
     "django_otp",
     "django_otp.plugins.otp_totp",
     "django_otp.plugins.otp_hotp",
@@ -75,18 +77,23 @@ INSTALLED_APPS = [
     "django_recaptcha",
 ]
 
+if not TESTING:
+    INSTALLED_APPS += ["debug_toolbar"]
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_otp.middleware.OTPMiddleware",
     "allauth.account.middleware.AccountMiddleware",
 ]
+
+if not TESTING:
+    MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
 
 ROOT_URLCONF = "app.urls"
 

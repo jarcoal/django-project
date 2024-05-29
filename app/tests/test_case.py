@@ -1,4 +1,5 @@
-from django.test import TestCase as DjangoTestCase, override_settings
+from django.test import TestCase as DjangoTestCase
+from django.test import override_settings
 from rest_framework.test import APIClient
 
 
