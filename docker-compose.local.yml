@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  web:
+    image: "mcr.microsoft.com/vscode/devcontainers/python:3.12"
+    command: sleep infinity
+    volumes:
+      - ./:/usr/src/app/
+    ports:
+      - "8000:8000"
+    environment:
+      PIPENV_VENV_IN_PROJECT: 1
+      DATABASE_URL: postgis://postgres:postgres@postgres:5432/postgres
+      REDIS_URL: redis://redis:6379
+      PORT: 8000
+      # This is needed to make celery ok with running the service
+      # as the root user when using pickle for serializing data.
+      # If we switch to JSON this can/should be removed.
+      C_FORCE_ROOT: "true"
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:16-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    user: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # We expose this right now so that we can connect to it from the Hasura
+    # repository. Ideally this would be removed and we would use the
+    # `networks` feature of docker-compose to connect the two services.
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+
+volumes:
+  postgres_data:
