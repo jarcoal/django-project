@@ -28,6 +28,9 @@
     <link rel="apple-touch-icon" href="icon.png" />
 
     <meta name="theme-color" content="#fafafa" />
+
+    {% load render_bundle from webpack_loader %}
+    {% render_bundle 'main' %}
   </head>
 
   <body>
