@@ -1,7 +1,7 @@
 {
 	"name": "Django App",
 	// Use Docker Compose
-	"dockerComposeFile": "../docker-compose.local.yml",
+	"dockerComposeFile": "docker-compose.yml",
 	// Specify which service in your docker-compose.yml is the primary application container
 	"service": "web",
 	// Set the same workspace folder as you have in your Docker Compose service

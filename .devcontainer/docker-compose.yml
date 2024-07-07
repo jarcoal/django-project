@@ -2,10 +2,12 @@ version: "3.8"
 
 services:
   web:
-    image: "mcr.microsoft.com/vscode/devcontainers/python:3.12"
+    build: 
+      context: .
+      dockerfile: Dockerfile
     command: sleep infinity
     volumes:
-      - ./:/usr/src/app/
+      - ../:/usr/src/app/
     ports:
       - "8000:8000"
     environment:
@@ -18,7 +20,7 @@ services:
       # If we switch to JSON this can/should be removed.
       C_FORCE_ROOT: "true"
     env_file:
-      - ./.env
+      - ../.env
     depends_on:
       - postgres
       - redis
@@ -36,11 +38,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    # We expose this right now so that we can connect to it from the Hasura
-    # repository. Ideally this would be removed and we would use the
-    # `networks` feature of docker-compose to connect the two services.
-    ports:
-      - "5432:5432"
 
   redis:
     image: redis:7-alpine
