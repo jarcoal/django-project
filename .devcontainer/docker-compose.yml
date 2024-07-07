@@ -1,24 +1,24 @@
-version: "3.8"
+version: '3.8'
 
 services:
   web:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     command: sleep infinity
     volumes:
       - ../:/usr/src/app/
     ports:
-      - "8000:8000"
+      - '${PORT}:${PORT}'
     environment:
       PIPENV_VENV_IN_PROJECT: 1
-      DATABASE_URL: postgis://postgres:postgres@postgres:5432/postgres
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
       REDIS_URL: redis://redis:6379
-      PORT: 8000
+      PORT: ${PORT}
       # This is needed to make celery ok with running the service
       # as the root user when using pickle for serializing data.
       # If we switch to JSON this can/should be removed.
-      C_FORCE_ROOT: "true"
+      C_FORCE_ROOT: 'true'
     env_file:
       - ../.env
     depends_on:
@@ -34,7 +34,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready" ]
+      test: ['CMD-SHELL', 'pg_isready']
       interval: 10s
       timeout: 5s
       retries: 5
