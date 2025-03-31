@@ -1,7 +1,9 @@
+import zoneinfo
+
 import factory
-import pytz
-from app.models import User
 from django.conf import settings
+
+from app.models import User
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -12,5 +14,5 @@ class UserFactory(factory.django.DjangoModelFactory):
     last_name = factory.Faker("last_name")
     email = factory.Sequence(lambda n: "user+%d@example.com" % n)
     image = factory.Faker("url")
-    timezone = pytz.UTC
+    timezone = zoneinfo.ZoneInfo("UTC")
     language = settings.LANGUAGE_CODE
