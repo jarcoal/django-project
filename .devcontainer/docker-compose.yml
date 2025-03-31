@@ -9,12 +9,12 @@ services:
     volumes:
       - ../:/usr/src/app/
     ports:
-      - '${PORT}:${PORT}'
+      - '8000:8000'
     environment:
       PIPENV_VENV_IN_PROJECT: 1
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
       REDIS_URL: redis://redis:6379
-      PORT: ${PORT}
+      PORT: 8000
       # This is needed to make celery ok with running the service
       # as the root user when using pickle for serializing data.
       # If we switch to JSON this can/should be removed.
