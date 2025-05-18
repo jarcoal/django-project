@@ -1,0 +1,85 @@
+---
+description: 
+globs: *_tests.py
+alwaysApply: false
+---
+# Use Factory.build() for Request Data
+
+When testing API endpoints, use `Factory.build()` to generate request data instead of constructing data dictionaries manually.
+
+## Do ✅
+
+```python
+from django.test import TestCase
+from django.urls import reverse
+from app.tests.factories import ProductFactory, CategoryFactory, SupplierFactory
+
+class ProductAPITests(TestCase):
+    def test_create_product(self):
+        """Test creating a new product via the API."""
+        # Setup
+        category = CategoryFactory()
+        supplier = SupplierFactory()
+        url = reverse('product-create')
+        
+        # Use Factory.build() to generate a model instance
+        product = ProductFactory.build(
+            category=category,  # Override only what's needed for the test
+            supplier=supplier,
+            unit_price=19.99
+        )
+        
+        # Explicitly construct request data with only the fields we need
+        product_data = {
+            "name": product.name,
+            "unit_price": product.unit_price,
+            "units_in_stock": product.units_in_stock,
+            "category_id": category.id,
+            "supplier_id": supplier.id,
+            "discontinued": product.discontinued
+        }
+        
+        # Make the request
+        response = self.client.post(url, data=product_data)
+        self.assertEqual(response.status_code, 201)
+```
+
+## Don't ❌
+
+```python
+from django.test import TestCase
+from django.urls import reverse
+
+class ProductAPITests(TestCase):
+    def test_create_product(self):
+        """Test creating a new product via the API."""
+        # Bad: Manually constructing request data without a factory
+        url = reverse('product-create')
+        data = {
+            "name": "Test Product",
+            "unit_price": 19.99,
+            "units_in_stock": 100,
+            "category_id": self.category.id,  # Brittle reference
+            "supplier_id": self.supplier.id,  # Brittle reference
+            "discontinued": False
+        }
+        response = self.client.post(url, data=data)
+
+    def test_create_product_bad_dict(self):
+        """Test creating a product - BAD: using .__dict__"""
+        # Bad: Using .__dict__ which may include complex objects
+        # or internal Django fields that won't serialize properly
+        product = ProductFactory.build()
+        response = self.client.post(url, data=product.__dict__)
+```
+
+## Guidelines
+
+1. Use `Factory.build()` to generate model instances for test data
+2. Explicitly construct request dictionaries with only the needed fields
+3. Only override factory fields needed for the test case
+4. Let the factory handle generating realistic default values
+5. Keep tests focused on behavior rather than data setup
+6. Ensures test data matches your model's expectations
+7. Makes tests more maintainable as model fields change
+8. Be mindful of data types that need special serialization (dates, decimals, etc.)

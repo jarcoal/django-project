@@ -1,0 +1,55 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Django Views
+
+Always use class-based views (CBVs) instead of function-based views (FBVs) for better code organization, reusability, and maintainability.
+
+## Do ✅
+
+```python
+# Good: Using a class-based view
+from django.views import View
+from django.http import HttpResponse
+
+class UserProfileView(View):
+    def get(self, request, user_id):
+        # Handle GET request
+        return HttpResponse("User profile")
+
+    def post(self, request, user_id):
+        # Handle POST request
+        return HttpResponse("Profile updated")
+
+# Good: Using a generic class-based view
+from django.views.generic import ListView
+
+class ArticleListView(ListView):
+    model = Article
+    template_name = 'articles/list.html'
+    context_object_name = 'articles'
+```
+
+## Don't ❌
+
+```python
+# Bad: Using a function-based view
+from django.http import HttpResponse
+
+def user_profile(request, user_id):
+    if request.method == 'GET':
+        return HttpResponse("User profile")
+    elif request.method == 'POST':
+        return HttpResponse("Profile updated")
+```
+
+## Guidelines
+
+1. Always use class-based views instead of function-based views
+2. Choose appropriate generic class-based views when possible (ListView, DetailView, etc.)
+3. Inherit from `View` for custom view logic that doesn't fit generic views
+4. Use method handlers (get, post, put, etc.) instead of checking request.method
+5. Override class-based view methods (get_queryset, get_context_data, etc.) for customization
+6. Use mixins to share common functionality between views

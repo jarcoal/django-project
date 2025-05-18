@@ -1,0 +1,66 @@
+---
+description: 
+globs: *_tests.py
+alwaysApply: false
+---
+# Always Use Factories in Tests
+
+When writing tests, always use factory classes instead of direct model creation methods. This ensures consistency in test data and makes tests more maintainable.
+
+## Do ✅
+
+```python
+# Good: Using factories
+supplier = SupplierFactory()
+product = ProductFactory(supplier=supplier)
+
+# Good: Only specifying fields that are important to the test
+product = ProductFactory(
+    unit_price=10.00,  # Important for test logic
+    discontinued=False,  # Important for test logic
+)
+
+# Good: Setting related fields directly
+product = ProductFactory(
+    supplier__company_name="Acme Inc",  # Sets company_name on the related supplier
+    unit_price=10.00,
+)
+```
+
+## Don't ❌
+
+```python
+# Bad: Using direct model creation
+supplier = Supplier.objects.create(
+    company_name="Acme Inc",
+    contact_name="John Doe",
+    contact_title="Sales Representative",
+    address="123 Main St",
+)
+
+# Bad: Over-specifying factory fields
+product = ProductFactory(
+    name="Test Product",
+    unit_price=10.00,
+    units_in_stock=100,
+    units_on_order=0,
+    reorder_level=10,
+    discontinued=False,
+    quantity_per_unit="24 boxes",
+    supplier=supplier,
+    category=category,
+)
+
+# Bad: Creating related objects separately
+supplier = SupplierFactory(company_name="Acme Inc")
+product = ProductFactory(supplier=supplier)
+```
+
+## Guidelines
+
+1. Always use factories instead of `Model.objects.create()`
+2. Only specify fields in the factory call that are directly relevant to the test logic
+3. Let the factory handle generating default values for other fields
+4. If a field's value is important for the test's assertions or logic, then specify it in the factory call
+5. Use factory traits or factory_boy's `SubFactory` for handling relationships between models
+6. Use double-underscore notation to set fields on related objects directly

@@ -1,0 +1,50 @@
+---
+description: 
+globs: *.html
+alwaysApply: false
+---
+# Django Template Blocks
+
+Django template blocks must include names: `{% endblock block_name %}`
+
+## Do ✅
+
+```html
+{# Good: Named block with matching endblock #}
+{% block content %}
+    <h1>Welcome</h1>
+{% endblock content %}
+
+{# Good: Nested blocks with names #}
+{% block main %}
+    {% block header %}
+        <h1>Header</h1>
+    {% endblock header %}
+    
+    {% block body %}
+        <p>Content</p>
+    {% endblock body %}
+{% endblock main %}
+```
+
+## Don't ❌
+
+```html
+{# Bad: Unnamed endblock #}
+{% block content %}
+    <h1>Welcome</h1>
+{% endblock %}
+
+{# Bad: Missing block name in nested blocks #}
+{% block main %}
+    {% block header %}
+        <h1>Header</h1>
+    {% endblock %}
+{% endblock main %}
+```
+
+## Guidelines
+
+1. Always include block name in `endblock` tag
+2. Match the name exactly as it appears in the opening tag
+3. Especially important for nested blocks to maintain clarity 

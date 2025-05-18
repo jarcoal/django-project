@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Django Migrations
+
+Never generate Django migration files, the developer will always handle this.
+
+## Guidelines
+
+1. Do not create or modify migration files
+2. Let the developer run `python manage.py makemigrations` when needed
+3. Model changes should be made without generating the corresponding migrations 

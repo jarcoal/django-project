@@ -1,0 +1,81 @@
+---
+description: 
+globs: *_tests.py
+alwaysApply: false
+---
+# Django Test Docstrings
+
+Include clear docstrings for all test methods that explain what the test does.
+
+## Do ✅
+
+```python
+from django.test import TestCase
+from app.models import Order, Product
+
+class OrderTests(TestCase):
+    def test_process_new_order(self):
+        """
+        Test that new orders are properly processed:
+        1. Order is created with correct items
+        2. Inventory levels are updated
+        3. Order status is set to 'Processing'
+        """
+        product = Product.objects.create(
+            name="Test Product",
+            unit_price=10.00,
+            units_in_stock=50
+        )
+        order = Order.objects.create(
+            customer_id=1,
+            order_date="2023-01-15"
+        )
+        self.assertEqual(order.status, "Processing")
+
+    def test_order_with_insufficient_inventory(self):
+        """
+        Test order validation with insufficient inventory:
+        - Should check each product's inventory level
+        - Should reject orders for out-of-stock items
+        - Should provide clear error message about which items are unavailable
+        """
+        # ... test implementation
+        pass
+```
+
+## Don't ❌
+
+```python
+from django.test import TestCase
+from app.models import Order, Product
+
+class OrderTests(TestCase):
+    # Bad: No docstring
+    def test_process_new_order(self):
+        product = Product.objects.create(
+            name="Test Product",
+            unit_price=10.00,
+            units_in_stock=50
+        )
+        order = Order.objects.create(
+            customer_id=1,
+            order_date="2023-01-15"
+        )
+        self.assertEqual(order.status, "Processing")
+
+    # Bad: Vague or unhelpful docstring
+    def test_order_processing(self):
+        """Test order processing."""
+        # ... test implementation
+        pass
+```
+
+## Guidelines
+
+1. Every test method should have a docstring
+2. Docstrings should explain:
+   - What functionality is being tested
+   - Expected behavior or outcomes
+   - Any specific conditions or setup
+3. Use bullet points or numbered lists for multiple assertions
+4. Be specific about the test's purpose

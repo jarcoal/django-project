@@ -1,0 +1,56 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Django Model Organization
+
+New models go in `app/models/` and must be registered in `__init__.py`.
+
+## Do ✅
+
+```python
+# Good: models/product.py
+from django.db import models
+
+class Product(models.Model):
+    name = models.CharField(max_length=100)
+    supplier = models.ForeignKey('Supplier', on_delete=models.CASCADE)
+    category = models.ForeignKey('Category', on_delete=models.CASCADE)
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    # ... rest of model definition
+
+# Good: models/__init__.py
+from .product import Product
+
+__all__ = ['Product']
+```
+
+## Don't ❌
+
+```python
+# Bad: Model defined in models.py
+# models.py
+from django.db import models
+
+class Product(models.Model):
+    name = models.CharField(max_length=100)
+    # ... rest of model definition
+
+# Bad: Model not registered in __init__.py
+# models/product.py
+from django.db import models
+
+class Product(models.Model):
+    name = models.CharField(max_length=100)
+    # ... rest of model definition
+```
+
+## Guidelines
+
+1. Place new models in `app/models/` directory
+2. Each model should be in its own file (e.g., `models/product.py`)
+3. Register all models in `models/__init__.py`
+4. Use `__all__` to explicitly define which models are exported 
+3. Register all models in `models/__init__.py`
+4. Use `__all__` to explicitly define which models are exported 

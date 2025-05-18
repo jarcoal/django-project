@@ -1,0 +1,86 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Django View Organization
+
+New views go in `app/views/` and must be registered in `__init__.py`. Each view file should have the suffix `_view.py`. Views must then be imported and configured in `urls.py`.
+
+## Do ✅
+
+```python
+# Good: views/product_view.py
+from django.views.generic import ListView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from app.models import Product
+
+class ProductListView(LoginRequiredMixin, ListView):
+    """View for listing products."""
+    model = Product
+    template_name = 'products/list.html'
+    context_object_name = 'products'
+    
+    def get_queryset(self):
+        return Product.objects.select_related('category', 'supplier')
+
+class ProductCreateView(LoginRequiredMixin, CreateView):
+    """View for creating new products."""
+    model = Product
+    template_name = 'products/create.html'
+    fields = ['name', 'supplier', 'category', 'unit_price']
+    success_url = '/products/'
+
+    def form_valid(self, form):
+        return super().form_valid(form)
+
+# Good: views/__init__.py
+from .product_view import ProductListView, ProductCreateView
+
+__all__ = ['ProductListView', 'ProductCreateView']
+
+# Good: urls.py
+from django.urls import path
+from app.views import ProductListView, ProductCreateView
+
+urlpatterns = [
+    path('products/', ProductListView.as_view(), name='product-list'),
+    path('products/create/', ProductCreateView.as_view(), name='product-create'),
+]
+```
+
+## Don't ❌
+
+```python
+# Bad: View defined in views.py
+# views.py
+from django.views.generic import ListView
+
+class ProductListView(ListView):
+    pass
+
+# Bad: View not registered in __init__.py
+# views/product.py  # Bad: Missing _view suffix
+from django.views.generic import ListView
+
+class ProductListView(ListView):
+    pass
+
+# Bad: URLs not properly configured
+# urls.py
+from django.urls import path
+from .views.product_view import ProductListView  # Bad: Direct import instead of through __init__
+
+urlpatterns = [
+    path('products', ProductListView.as_view()),  # Bad: Missing trailing slash and name
+]
+```
+
+## Guidelines
+
+1. Place new views in `app/views/` directory
+2. Each view module should be in its own file with the suffix `_view.py` (e.g., `views/product_view.py`)
+3. Register all views in `views/__init__.py`
+4. Use `__all__` to explicitly define which views are exported
+5. Import views from the views package in `urls.py` (e.g., `from app.views import ProductListView`)
+6. Always include a trailing slash and name parameter in URL patterns 

@@ -1,0 +1,74 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Django Factory Organization
+
+New factories go in `app/tests/factories/` and must be registered in `__init__.py`.
+
+## Do ✅
+
+```python
+# Good: factories/product_factory.py
+import factory
+from app.models import Product, Category, Supplier
+
+class CategoryFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Category
+        
+    name = factory.Sequence(lambda n: f"Category {n}")
+    description = "Test Category"
+
+class SupplierFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Supplier
+        
+    company_name = factory.Sequence(lambda n: f"Supplier {n}")
+    contact_name = "Test Contact"
+
+class ProductFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Product
+
+    name = factory.Sequence(lambda n: f"Product {n}")
+    category = factory.SubFactory(CategoryFactory)
+    supplier = factory.SubFactory(SupplierFactory)
+    unit_price = 10.00
+
+# Good: factories/__init__.py
+from .product_factory import ProductFactory, CategoryFactory, SupplierFactory
+
+__all__ = ['ProductFactory', 'CategoryFactory', 'SupplierFactory']
+```
+
+## Don't ❌
+
+```python
+# Bad: Factory defined in test file
+# tests/product_tests.py
+import factory
+from app.models import Product
+
+class ProductFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Product
+
+# Bad: Wrong file naming pattern
+# tests/factories/product.py
+import factory
+from app.models import Product
+
+class ProductFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Product
+```
+
+## Guidelines
+
+1. Place new factories in `app/tests/factories/` directory
+2. Each factory module should be in its own file with `_factory.py` suffix (e.g., `factories/product_factory.py`)
+3. Register all factories in `factories/__init__.py`
+4. Use `__all__` to explicitly define which factories are exported
+5. Follow factory_boy's best practices for factory definitions 

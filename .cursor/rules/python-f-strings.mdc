@@ -1,0 +1,36 @@
+---
+description: 
+globs: *.py
+alwaysApply: false
+---
+# Python String Formatting
+
+Always use f-strings for string interpolation instead of `.format()` or `%` formatting.
+
+## Do ✅
+
+```python
+# Good: Using f-strings for string interpolation
+def format_order_summary(order):
+    return f"Order {order.id} from {order.customer.company_name} totaling ${order.total_amount:.2f}"
+
+# Good: Using f-strings for simple variable interpolation
+def get_product_status(self):
+    return f"Product {self.name} has {self.units_in_stock} units in stock"
+```
+
+## Don't ❌
+
+```python
+# Bad: Using old string formatting
+def format_order_summary(order):
+    return "Order %s from %s totaling $%.2f" % (order.id, order.customer.company_name, order.total_amount)
+    # or
+    return "Order {} from {} totaling ${:.2f}".format(order.id, order.customer.company_name, order.total_amount)
+```
+
+## Guidelines
+
+1. Use f-strings for all string interpolation
+2. Avoid `.format()` and `%` formatting
+3. Use f-strings even for simple variable interpolation

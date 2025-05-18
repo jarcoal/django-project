@@ -1,0 +1,93 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Django ViewSet Organization
+
+New ViewSets go in `app/viewsets/` and must be registered in `__init__.py`. Each viewset file should have the suffix `_viewset.py`. ViewSets must then be imported and configured in `urls.py` using a DRF Router.
+
+## Do ✅
+
+```python
+# Good: viewsets/product_viewset.py
+from rest_framework import viewsets, response
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from app.models import Product
+from app.serializers import ProductSerializer
+
+class ProductViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing products via the API."""
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProductSerializer
+    
+    def get_queryset(self):
+        return Product.objects.select_related('category', 'supplier')
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+    @action(detail=True, methods=['post'])
+    def discount(self, request, pk=None):
+        """Custom action to apply a discount to a product."""
+        product = self.get_object()
+        discount = request.data.get('discount', 0)
+        product.unit_price = product.unit_price * (1 - discount/100)
+        product.save(update_fields=['unit_price'])
+        return Response({'status': 'discount applied'})
+
+# Good: viewsets/__init__.py
+from .product_viewset import ProductViewSet
+
+__all__ = ['ProductViewSet']
+
+# Good: urls.py
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from app.viewsets import ProductViewSet
+
+router = DefaultRouter()
+router.register('products', ProductViewSet, basename='api-product')
+
+urlpatterns = [
+    path('api/v1/', include(router.urls)),
+]
+```
+
+## Don't ❌
+
+```python
+# Bad: ViewSet defined in views.py or views/
+# views.py
+from rest_framework import viewsets
+
+class ProductViewSet(viewsets.ModelViewSet):
+    pass
+
+# Bad: ViewSet not registered in __init__.py
+# viewsets/product.py  # Bad: Missing _viewset suffix
+from rest_framework import viewsets
+
+class ProductViewSet(viewsets.ModelViewSet):
+    pass
+
+# Bad: URLs not properly configured
+# urls.py
+from django.urls import path
+from .viewsets.product_viewset import ProductViewSet  # Bad: Direct import instead of through __init__
+
+urlpatterns = [
+    path('api/products/', ProductViewSet.as_view({'get': 'list'})),  # Bad: Manual ViewSet URL configuration
+]
+```
+
+## Guidelines
+
+1. Place new ViewSets in `app/viewsets/` directory
+2. Each ViewSet module should be in its own file with the suffix `_viewset.py` (e.g., `viewsets/product_viewset.py`)
+3. Register all ViewSets in `viewsets/__init__.py`
+4. Use `__all__` to explicitly define which ViewSets are exported
+5. Import ViewSets from the viewsets package in `urls.py` (e.g., `from app.viewsets import ProductViewSet`)
+6. Always use a DRF Router to configure ViewSet URLs
+7. Place API URLs under an `/api/v1/` prefix for proper versioning 

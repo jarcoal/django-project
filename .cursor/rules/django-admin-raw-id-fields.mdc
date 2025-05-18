@@ -1,0 +1,47 @@
+---
+description: 
+globs: *_admin.py
+alwaysApply: false
+---
+# Django Admin Raw ID Fields
+
+Always use `raw_id_fields` for foreign key fields in Django admin classes that could have many entries to prevent loading large dropdown lists.
+
+## Do ✅
+
+```python
+# Good: Using raw_id_fields for foreign keys with many entries
+from django.contrib import admin
+from app.models import Order
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    raw_id_fields = ['customer', 'employee', 'shipper']
+    list_display = ['order_date', 'customer', 'employee', 'required_date']
+```
+
+## Don't ❌
+
+```python
+# Bad: Not using raw_id_fields for foreign keys with many entries
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ['order_date', 'customer', 'employee', 'required_date']
+    # Missing raw_id_fields for customer, employee, and shipper
+```
+
+## Guidelines
+
+1. Use `raw_id_fields` for any foreign key field that could have more than 100 entries
+2. Common candidates for `raw_id_fields` include:
+   - Customer references
+   - Product references in OrderDetails
+   - Employee references
+   - Any foreign key that could grow large over time
+3. The field will be replaced with a magnifying glass icon that opens a popup window for selection
+
+## Benefits
+
+1. **Performance**: Prevents loading large dropdown lists that can slow down the admin interface
+2. **Usability**: Makes it easier to find specific entries in large datasets
+3. **Scalability**: Admin interface remains responsive even as related tables grow 

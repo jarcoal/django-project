@@ -1,0 +1,64 @@
+---
+description: Read this before creating a new serializer.
+globs: 
+alwaysApply: false
+---
+# Django Serializer Organization
+
+New Serializers go in `app/serializers/` and must be registered in `__init__.py`. Each serializer file should have the suffix `_serializer.py`.
+
+## Do ✅
+
+```python
+# Good: serializers/product_serializer.py
+from rest_framework import serializers
+from app.models import Product, Category
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name']
+
+class ProductSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'unit_price', 'category']
+
+# Good: serializers/__init__.py
+from .product_serializer import ProductSerializer, CategorySerializer
+
+__all__ = ['ProductSerializer', 'CategorySerializer']
+```
+
+## Don't ❌
+
+```python
+# Bad: Serializer defined in serializers.py
+# serializers.py
+from rest_framework import serializers
+from app.models import Product
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['name']
+
+# Bad: Serializer not registered in __init__.py
+# serializers/product.py  # Bad: Missing _serializer suffix
+from rest_framework import serializers
+from app.models import Product
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['name']
+```
+
+## Guidelines
+
+1. Place new serializers in `app/serializers/` directory
+2. Each serializer module should be in its own file with the suffix `_serializer.py` (e.g., `serializers/product_serializer.py`)
+3. Register all serializers in `serializers/__init__.py`
+4. Use `__all__` to explicitly define which serializers are exported

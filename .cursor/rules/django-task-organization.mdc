@@ -1,0 +1,59 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Django Task Organization
+
+New Tasks go in `app/tasks/` and must be registered in `__init__.py`.
+
+## Do ✅
+
+```python
+# Good: tasks/order.py
+from django.conf import settings
+from app.celery import app
+from app.utils.retryable_task import RetryableTask
+from app.models import Order
+
+@app.task(base=RetryableTask, queue=settings.ORDER_QUEUE)
+def process_order(order_id: int) -> None:
+    # ... task implementation for processing an order
+    order = Order.objects.get(id=order_id)
+    order.status = 'PROCESSING'
+    order.save(update_fields=['status'])
+    # further processing...
+
+# Good: tasks/__init__.py
+from .order import process_order
+
+__all__ = ['process_order']
+```
+
+## Don't ❌
+
+```python
+# Bad: Task defined in tasks.py
+# tasks.py
+from celery import shared_task
+
+@shared_task
+def process_order(order_id: int) -> None:
+    pass
+
+# Bad: Task not registered in __init__.py
+# tasks/order.py
+from app.celery import app
+
+@app.task
+def process_order(order_id: int) -> None:
+    pass
+```
+
+## Guidelines
+
+1. Place new tasks in `app/tasks/` directory
+2. Each task module should be in its own file (e.g., `tasks/order.py`)
+3. Register all tasks in `tasks/__init__.py`
+4. Use `__all__` to explicitly define which tasks are exported
+5. Use `@app.task` with appropriate base class and queue settings 
