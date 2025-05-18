@@ -1,0 +1,82 @@
+# Django View Organization
+
+New views go in `app/views/` and must be registered in `__init__.py`. Each view file should have the suffix `_view.py`. Views must then be imported and configured in `urls.py`.
+
+## Do ✅
+
+```python
+# Good: views/email_view.py
+from django.views.generic import ListView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from app.models import EmailMessage
+
+class EmailListView(LoginRequiredMixin, ListView):
+    """View for listing email messages."""
+    model = EmailMessage
+    template_name = 'emails/list.html'
+    context_object_name = 'emails'
+    
+    def get_queryset(self):
+        return EmailMessage.objects.filter(user=self.request.user)
+
+class EmailCreateView(LoginRequiredMixin, CreateView):
+    """View for creating new email messages."""
+    model = EmailMessage
+    template_name = 'emails/create.html'
+    fields = ['subject', 'body', 'recipients']
+    success_url = '/emails/'
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+# Good: views/__init__.py
+from .email_view import EmailListView, EmailCreateView
+
+__all__ = ['EmailListView', 'EmailCreateView']
+
+# Good: urls.py
+from django.urls import path
+from app.views import EmailListView, EmailCreateView
+
+urlpatterns = [
+    path('emails/', EmailListView.as_view(), name='email-list'),
+    path('emails/create/', EmailCreateView.as_view(), name='email-create'),
+]
+```
+
+## Don't ❌
+
+```python
+# Bad: View defined in views.py
+# views.py
+from django.views.generic import ListView
+
+class EmailListView(ListView):
+    pass
+
+# Bad: View not registered in __init__.py
+# views/email.py  # Bad: Missing _view suffix
+from django.views.generic import ListView
+
+class EmailListView(ListView):
+    pass
+
+# Bad: URLs not properly configured
+# urls.py
+from django.urls import path
+from .views.email_view import EmailListView  # Bad: Direct import instead of through __init__
+
+urlpatterns = [
+    path('emails', EmailListView.as_view()),  # Bad: Missing trailing slash and name
+]
+```
+
+## Guidelines
+
+1. Place new views in `app/views/` directory
+2. Each view module should be in its own file with the suffix `_view.py` (e.g., `views/email_view.py`)
+3. Register all views in `views/__init__.py`
+4. Use `__all__` to explicitly define which views are exported
+5. Import views from the views package in `urls.py` (e.g., `from app.views import EmailListView`)
+6. Always include a trailing slash and name parameter in URL patterns 

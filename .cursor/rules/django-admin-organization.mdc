@@ -1,0 +1,58 @@
+---
+description:
+globs:
+  - "*/admin/*.py"
+  - "*/admin/__init__.py"
+alwaysApply: true
+---
+
+# Django Admin Organization
+
+New Model admins go in `app/admin/` and must be registered in `__init__.py`.
+
+## Do ✅
+
+```pyapp
+# Good: admin/email.py
+from django.contrib import admin
+from app.models import EmailMessage
+
+@admin.register(EmailMessage)
+class EmailMessageAdmin(admin.ModelAdmin):
+    list_display = ['message_id', 'sender']
+    # ... rest of admin definition
+
+# Good: admin/__init__.py
+from .email import EmailMessageAdmin
+
+__all__ = ['EmailMessageAdmin']
+```
+
+## Don't ❌
+
+```python
+# Badappfined in admin.py
+# admin.py
+from django.contrib import admin
+from app.models import EmailMessage
+
+@admin.register(EmailMessage)
+class EmailMessageAdmin(admin.ModelAdmin):
+    list_display = ['message_id', 'sender']
+
+# Badappt registered in __init__.py
+# admin/email.py
+from django.contrib import admin
+from app.models import EmailMessage
+
+@admin.register(EmailMessage)
+class EmailMessageAdmin(admin.ModelAdmin):
+    list_display = ['message_id', 'sender']
+```
+app
+## Guidelines
+
+1. Place new model admins in `app/admin/` directory
+2. Each model admin should be in its own file (e.g., `admin/email.py`)
+3. Register all model admins in `admin/__init__.py`
+4. Use `__all__` to explicitly define which model admins are exported 

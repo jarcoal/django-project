@@ -1,0 +1,57 @@
+---
+description: Read this before creating a new serializer.
+globs: 
+alwaysApply: false
+---
+# Django Serializer Organization
+
+New Serializers go in `app/serializers/` and must be registered in `__init__.py`. Each serializer file should have the suffix `_serializer.py`.
+
+## Do ✅
+
+```python
+# Good: serializers/email_serializer.py
+from rest_framework import serializers
+from app.models import EmailMessage
+
+class EmailMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmailMessage
+        fields = ['message_id', 'from_address', 'subject']
+
+# Good: serializers/__init__.py
+from .email_serializer import EmailMessageSerializer
+
+__all__ = ['EmailMessageSerializer']
+```
+
+## Don't ❌
+
+```python
+# Bad: Serializer defined in serializers.py
+# serializers.py
+from rest_framework import serializers
+from app.models import EmailMessage
+
+class EmailMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmailMessage
+        fields = ['message_id']
+
+# Bad: Serializer not registered in __init__.py
+# serializers/email.py  # Bad: Missing _serializer suffix
+from rest_framework import serializers
+from app.models import EmailMessage
+
+class EmailMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmailMessage
+        fields = ['message_id']
+```
+
+## Guidelines
+
+1. Place new serializers in `app/serializers/` directory
+2. Each serializer module should be in its own file with the suffix `_serializer.py` (e.g., `serializers/email_serializer.py`)
+3. Register all serializers in `serializers/__init__.py`
+4. Use `__all__` to explicitly define which serializers are exported

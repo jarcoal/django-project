@@ -1,0 +1,84 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# Avoid setUp and setUpTestData in Tests
+
+When writing tests, prefer creating test data directly within each test method rather than using `setUp` or `setUpTestData`. This approach makes tests more explicit, easier to understand, and reduces hidden dependencies between tests.
+
+## Do ✅
+
+```python
+# Good: Data creation directly in the test
+class TestMessageProcessing(TestCase):
+    def test_message_processing(self):
+        conversation = ConversationFactory()
+        message = MessageFactory(
+            conversation=conversation,
+            message_id="test123",
+            is_outbound=False
+        )
+        
+        result = process_message(message)
+        self.assertEqual(result.status, "processed")
+
+    def test_invalid_message(self):
+        message = MessageFactory(
+            message_id="invalid123",
+            is_outbound=True
+        )
+        
+        with self.assertRaises(ValidationError):
+            process_message(message)
+```
+
+## Don't ❌
+
+```python
+# Bad: Using setUp for data creation
+class TestMessageProcessing(TestCase):
+    def setUp(self):
+        self.conversation = ConversationFactory()
+        self.message = MessageFactory(
+            conversation=self.conversation,
+            message_id="test123"
+        )
+    
+    def test_message_processing(self):
+        result = process_message(self.message)
+        self.assertEqual(result.status, "processed")
+    
+    def test_invalid_message(self):
+        self.message.message_id = "invalid123"
+        with self.assertRaises(ValidationError):
+            process_message(self.message)
+
+# Bad: Using setUpTestData for shared data
+class TestMessageProcessing(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.conversation = ConversationFactory()
+        cls.message = MessageFactory(
+            conversation=cls.conversation,
+            message_id="test123"
+        )
+```
+
+## Guidelines
+
+1. Create test data directly within each test method
+2. Only use `setUp` for truly shared setup that isn't test data (like configuring test clients or mocking external services)
+3. Avoid using `setUpTestData` for creating test data
+4. Each test should be self-contained and not rely on data created in other tests
+5. If you find yourself repeating data creation across many tests, consider creating helper methods within the test class
+6. The only exception to this rule is when you have a large dataset that is truly shared across all tests and would be expensive to recreate for each test
+
+## Benefits
+
+1. **Explicit Dependencies**: Each test clearly shows what data it needs
+2. **Easier Debugging**: When a test fails, you don't need to look elsewhere to understand the test data
+3. **Test Isolation**: Tests are truly independent and can't affect each other through shared state
+4. **Better Readability**: The test's setup is immediately visible in the test method
+5. **Easier Maintenance**: Changes to one test's data setup won't affect other tests 

@@ -1,0 +1,71 @@
+---
+description: 
+globs: *_tests.py
+alwaysApply: false
+---
+# Django Test Docstrings
+
+Include clear docstrings for all test methods that explain what the test does.
+
+## Do ✅
+
+```python
+from django.test import TestCase
+from app.models import EmailMessage
+
+class EmailMessageTests(TestCase):
+    def test_process_inbound_email(self):
+        """
+        Test that inbound emails are properly processed:
+        1. Email is parsed correctly
+        2. New conversation is created if no existing thread
+        3. Message is attached to the conversation
+        """
+        message = EmailMessage.objects.create(
+            message_id="test123",
+            from_address="test@example.com",
+        )
+        self.assertEqual(message.message_id, "test123")
+
+    def test_reply_to_existing_conversation(self):
+        """
+        Test that reply emails are properly threaded:
+        - Should find the parent message by in-reply-to header
+        - Should attach to existing conversation
+        - Should maintain the original subject
+        """
+        # ... test implementation
+        pass
+```
+
+## Don't ❌
+
+```python
+from django.test import TestCase
+from app.models import EmailMessage
+
+class EmailMessageTests(TestCase):
+    # Bad: No docstring
+    def test_process_inbound_email(self):
+        message = EmailMessage.objects.create(
+            message_id="test123",
+            from_address="test@example.com",
+        )
+        self.assertEqual(message.message_id, "test123")
+
+    # Bad: Vague or unhelpful docstring
+    def test_email_processing(self):
+        """Test email processing."""
+        # ... test implementation
+        pass
+```
+
+## Guidelines
+
+1. Every test method should have a docstring
+2. Docstrings should explain:
+   - What functionality is being tested
+   - Expected behavior or outcomes
+   - Any specific conditions or setup
+3. Use bullet points or numbered lists for multiple assertions
+4. Be specific about the test's purpose

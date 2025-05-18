@@ -1,0 +1,16 @@
+---
+description: 
+globs: *_tests.py
+alwaysApply: false
+---
+# Test Class Naming Conventions
+
+## Guidelines
+
+1. View test classes must be named `[ViewName]ViewTests`
+   - Example: `UserProfileViewTests` for `UserProfileView`
+   - Example: `CreateOrderViewTests` for `CreateOrderView`
+
+2. Task test classes must be named `[TaskName]TaskTests`
+   - Example: `ProcessPaymentTaskTests` for `ProcessPaymentTask`
+   - Example: `SendEmailTaskTests` for `SendEmailTask`

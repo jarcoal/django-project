@@ -1,0 +1,62 @@
+---
+description:
+globs:
+  - "*/tests/factories/*_factory.py"
+  - "*/tests/factories/__init__.py"
+alwaysApply: true
+---
+
+# Django Factory Organization
+
+New factories go in `app/tests/factories/` and must be registered in `__init__.py`.
+
+## Do ✅
+
+```python
+# Good: factories/email_message_factory.py
+import factory
+from app.models import EmailMessage
+
+class EmailMessageFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = EmailMessage
+
+    message_id = factory.Sequence(lambda n: f"test-{n}")
+    from_address = "test@example.com"
+    subject = "Test Subject"
+
+# Good: factories/__init__.py
+from .email_message_factory import EmailMessageFactory
+
+__all__ = ['EmailMessageFactory']
+```
+
+## Don't ❌
+
+```python
+# Bad: Factory defined in test file
+# tests/email_tests.py
+import factory
+from app.models import EmailMessage
+
+class EmailMessageFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = EmailMessage
+
+# Bad: Wrong file naming pattern
+# tests/factories/email.py
+import factory
+from app.models import EmailMessage
+
+class EmailMessageFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = EmailMessage
+```
+
+## Guidelines
+
+1. Place new factories in `app/tests/factories/` directory
+2. Each factory module should be in its own file with `_factory.py` suffix (e.g., `factories/email_message_factory.py`)
+3. Register all factories in `factories/__init__.py`
+4. Use `__all__` to explicitly define which factories are exported
+5. Follow factory_boy's best practices for factory definitions 

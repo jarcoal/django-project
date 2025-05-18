@@ -1,0 +1,36 @@
+---
+description: 
+globs: *.py
+alwaysApply: false
+---
+# Python String Formatting
+
+Always use f-strings for string interpolation instead of `.format()` or `%` formatting.
+
+## Do ✅
+
+```python
+# Good: Using f-strings for string interpolation
+def format_message(message):
+    return f"Processing message {message.id} from {message.sender}"
+
+# Good: Using f-strings for simple variable interpolation
+def get_status_display(self):
+    return f"Message {self.message_id} is {self.status}"
+```
+
+## Don't ❌
+
+```python
+# Bad: Using old string formatting
+def format_message(message):
+    return "Processing message %s from %s" % (message.id, message.sender)
+    # or
+    return "Processing message {} from {}".format(message.id, message.sender)
+```
+
+## Guidelines
+
+1. Use f-strings for all string interpolation
+2. Avoid `.format()` and `%` formatting
+3. Use f-strings even for simple variable interpolation

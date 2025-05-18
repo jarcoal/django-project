@@ -1,0 +1,46 @@
+---
+description:
+globs:
+  - "*.py"
+alwaysApply: true
+---
+
+# Python Line Length
+
+Maximum line length is 88 characters for comments and docstrings (Black formatter will handle code).
+
+## Do ✅
+
+```python
+# Good: Folding long comments to next line
+# This is a very long comment that should be folded to the next line when it
+# reaches the maximum length of 88 characters
+
+# Good: Using noqa only for code that can't be formatted below 88 chars
+def get_very_long_docstring(
+    param1,
+    param2,
+    param3,
+    param4,
+    param5,
+    param6,
+    param7,
+    param8,
+):  # noqa: E501
+    """This is a very long docstring that exceeds the maximum length and needs a noqa comment."""
+    pass
+```
+
+## Don't ❌
+
+```python
+# Bad: Using noqa for comments that can be folded
+# This is a very long comment that should be folded to the next line when it reaches the maximum length of 88 characters  # noqa: E501
+```
+
+## Guidelines
+
+1. Maximum line length is 88 characters for comments and docstrings
+2. Let Black formatter handle code line length
+3. Fold long comments and docstrings to the next line
+4. Only use `# noqa: E501` for code that cannot be formatted below 88 characters 

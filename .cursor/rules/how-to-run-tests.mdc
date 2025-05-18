@@ -1,0 +1,43 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# How to Run Tests
+
+Always use the correct command to run tests to ensure consistent test execution and proper test discovery.
+
+## Do ✅
+
+```bash
+# Good: Run the entire test suite
+pipenv run ./manage.py test --noinput --pattern="*_tests.py" -v 2
+
+# Good: Run a specific test suite
+pipenv run ./manage.py test app.tests.SUITE_NAME_HERE --noinput --pattern="*_tests.py" -v 2
+```
+
+## Don't ❌
+
+```bash
+# Bad: Running without --noinput flag
+pipenv run ./manage.py test
+
+# Bad: Running without the correct pattern
+pipenv run ./manage.py test app.tests
+
+# Bad: Running without verbosity level
+pipenv run ./manage.py test app.tests --noinput --pattern="*_tests.py"
+
+# Bad: Using python directly
+python manage.py test
+```
+
+## Guidelines
+
+1. Always use `pipenv run` to ensure the correct virtual environment is used
+2. Always include the `--noinput` flag to prevent any interactive prompts
+3. Always use the `--pattern="*_tests.py"` flag to ensure consistent test discovery
+4. Always include the `-v 2` parameter for verbose output that confirms which tests are being run
+5. When running specific suites, use the full path to the test suite (e.g., `app.tests.SUITE_NAME_HERE`)
+6. Never run tests directly with `python` - always use `pipenv run`

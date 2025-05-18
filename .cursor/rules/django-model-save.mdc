@@ -1,0 +1,56 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Django Model Saving Best Practices
+
+When saving Django models, especially when updating existing objects, optimize database operations by specifying which fields have been changed.
+
+## Use update_fields When Modifying Specific Fields
+
+Always specify the `update_fields` parameter when calling `save()` if you're only updating a subset of model fields.
+
+### Do ✅
+
+```python
+# Good: Specifying which fields to update
+user.first_name = "New Name"
+user.save(update_fields=["first_name"])
+
+# Good: When updating multiple specific fields
+post.title = "Updated Title"
+post.content = "Updated content"
+post.save(update_fields=["title", "content"])
+```
+
+### Don't ❌
+
+```python
+# Bad: Saving without update_fields when only changing specific fields
+user.first_name = "New Name"
+user.save()
+
+# Bad: Including fields that weren't changed
+post.title = "Updated Title"
+post.save(update_fields=["title", "content"])  # content wasn't modified
+```
+
+## Benefits
+
+1. **Performance**: Only the specified fields are updated in the database
+2. **Reduces Race Conditions**: Prevents overwriting other concurrent changes to unrelated fields
+3. **Clearer Intent**: Makes it explicit which fields are being modified
+
+## When to Skip update_fields
+
+Only skip `update_fields` when:
+- Creating new objects
+- Updating all or most fields of an object
+- Using `F()` expressions that modify fields in the database
+
+## Guidelines
+
+1. Always specify `update_fields` when modifying a subset of model fields
+2. Only include fields that were actually changed
+3. Consider creating helper methods for common field updates 

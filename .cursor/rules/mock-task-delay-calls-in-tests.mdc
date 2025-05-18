@@ -1,0 +1,94 @@
+---
+description: 
+globs: *_tests.py
+alwaysApply: false
+---
+# Mocking Celery Task Delay Calls
+
+## Guidelines
+
+1. Always mock task.delay() calls in tests
+   ```python
+   @patch('app.tasks.send_email_task.send_email.delay')
+   def test_my_view(self, mock_task_delay):
+       # Test code here
+       mock_task_delay.assert_called_once_with(recipient='user@example.com')
+   ```
+
+2. Placement of Mock
+   - Use @patch decorator at the test method level, not class level
+   - Target the exact path: `app.tasks.[task_module].[task_name].delay`
+   - Place mock parameters in reverse order of decorators (rightmost decorator's mock comes first in method params)
+
+3. Verification
+   - Always verify the task was queued using assert_called_once_with() or assert_called_with()
+   - Check that all expected arguments were passed correctly
+   - Don't set return_values for delay() mocks - tasks should be fire-and-forget
+
+4. Common Patterns
+   ```python
+   # Single task call verification
+   mock_task_delay.assert_called_once_with(user_id=1, template_name="welcome")
+
+   # Multiple task calls verification
+   self.assertEqual(mock_task_delay.call_count, 3)
+   mock_task_delay.assert_has_calls([
+       call(user_id=1, template_name="step1"),
+       call(user_id=1, template_name="step2"),
+       call(user_id=1, template_name="step3")
+   ])
+
+   # Verifying task was not called
+   mock_task_delay.assert_not_called()
+   ```
+
+5. Don'ts ❌
+   - Don't mock the actual task function, only mock the delay() method
+   - Don't set return values on delay() mocks unless explicitly needed by the code
+   - Don't verify actual task execution in these tests - that belongs in task-specific tests
+
+## Example Implementation
+
+```python
+from unittest.mock import patch
+from django.test import TestCase
+
+class UserRegistrationViewTests(TestCase):
+    @patch('app.tasks.notification_task.send_slack_notification.delay')
+    @patch('app.tasks.send_email_task.send_email.delay')
+    def test_registration_queues_tasks(self, mock_send_email, mock_slack_notification):
+        # Arrange
+        user_data = {
+            "email": "new@example.com",
+            "password": "securepass123"
+        }
+        
+        # Act
+        response = self.client.post('/api/register/', user_data)
+        
+        # Assert
+        self.assertEqual(response.status_code, 201)
+        mock_send_email.assert_called_once_with(
+            recipient=user_data['email'],
+            template_name='welcome_email'
+        )
+        mock_slack_notification.assert_called_once_with(
+            channel='#new-users',
+            message=f"New user registered: {user_data['email']}"
+        )
+```
+
+## Common Gotchas
+
+1. Import Path
+   - Always use the full path: `app.tasks.[task_module].[task_name].delay`
+   - Example: `app.tasks.send_email_task.send_email.delay`
+   - Example: `app.tasks.notification_task.send_slack_notification.delay`
+
+2. Multiple Tasks
+   - When mocking multiple tasks, remember decorator order matters
+   - Mock parameters are provided to the test method in reverse order of decorators
+
+3. Task Arguments
+   - Always verify both positional and keyword arguments
+   - For tasks with many arguments, consider using assert_called_once_with() with explicit kwarg matching

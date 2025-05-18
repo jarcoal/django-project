@@ -1,0 +1,60 @@
+---
+description:
+globs:
+  - "*/tests/*_tests.py"
+alwaysApply: true
+---
+
+# Django Test Organization
+
+New Tests go in `app/tests/` (no registration needed in `__init__.py`).
+
+## Do ✅
+
+```python
+# Good: tests/email_messages_tests.py
+from django.test import TestCase
+from app.models import EmailMessage
+
+class TestEmailMessage(TestCase):
+    def test_process_inbound_email(self):
+        message = EmailMessage.objects.create(
+            message_id="test123",
+            from_address="test@example.com",
+        )
+        self.assertEqual(message.message_id, "test123")
+
+    def test_another_email_feature(self):
+        # ... test implementation
+        pass
+```
+
+## Don't ❌
+
+```python
+# Bad: Tests defined in tests.py
+# tests.py
+from django.test import TestCase
+from app.models import EmailMessage
+
+class TestEmailMessage(TestCase):
+    def test_process_inbound_email(self):
+        pass
+
+# Bad: Wrong file naming pattern
+# tests/test_email_messages.py
+from django.test import TestCase
+from app.models import EmailMessage
+
+class TestEmailMessage(TestCase):
+    def test_process_inbound_email(self):
+        pass
+```
+
+## Guidelines
+
+1. Place new tests in `app/tests/` directory
+2. Each test module should be in its own file (e.g., `tests/email_messages_tests.py`)
+3. Test files must end with `_tests.py`
+4. No need to register tests in `__init__.py`
+5. Group related tests in the same file 

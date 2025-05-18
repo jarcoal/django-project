@@ -1,0 +1,61 @@
+---
+description:
+globs:
+  - "*/templates/*.html"
+alwaysApply: true
+---
+
+# Django Template Translations
+
+Use `{% trans %}` for simple strings and `{% blocktranslate %}` for complex translations.
+
+## Do ✅
+
+```html
+{# Good: Simple string translation #}
+<h1>{% trans "Welcome to our site" %}</h1>
+
+{# Good: Translation with variables #}
+{% blocktranslate with name=user.name %}
+    Hello {{ name }}, welcome to our site
+{% endblocktranslate %}
+
+{# Good: Multi-line translation #}
+{% blocktranslate %}
+    This is a long message that spans
+    multiple lines and needs to maintain
+    its formatting
+{% endblocktranslate %}
+
+{# Good: Complex formatting with HTML #}
+{% blocktranslate %}
+    <p>Please confirm your email at <strong>{{ email }}</strong>
+    to complete your registration.</p>
+{% endblocktranslate %}
+```
+
+## Don't ❌
+
+```html
+{# Bad: Using trans with variables #}
+<p>{% trans "Hello {{ name }}" %}</p>
+
+{# Bad: Using trans for multi-line content #}
+<p>{% trans "This is a long message that
+    spans multiple lines" %}</p>
+
+{# Bad: Using trans with complex formatting #}
+<p>{% trans "Click <a href='{{ url }}'>here</a> to continue" %}</p>
+```
+
+## Guidelines
+
+1. Use `{% trans %}` for:
+   - Simple, single-line strings
+   - No variables or formatting
+
+2. Use `{% blocktranslate %}` for:
+   - Strings with variables
+   - Multi-line content
+   - Content with HTML formatting
+   - Complex string interpolation 

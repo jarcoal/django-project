@@ -1,0 +1,72 @@
+# Django Signal Organization
+
+New signals go in `app/signals/` and must be registered in `__init__.py`. Each signal file should have the suffix `_signal.py`. Signal handlers must be connected to their signals in `__init__.py`.
+
+## Do ✅
+
+```python
+# Good: signals/email_signal.py
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from app.models import EmailMessage
+
+@receiver(post_save, sender=EmailMessage)
+def handle_email_saved(sender, instance, created, **kwargs):
+    """Handle post-save signal for EmailMessage model."""
+    if created:
+        instance.send_notification()
+
+@receiver(post_save, sender=EmailMessage)
+def update_email_stats(sender, instance, **kwargs):
+    """Update email statistics after save."""
+    instance.update_stats()
+
+# Good: signals/__init__.py
+from django.apps import AppConfig
+from .email_signal import handle_email_saved, update_email_stats
+
+__all__ = ['handle_email_saved', 'update_email_stats']
+
+# The signal handlers will be automatically connected due to the @receiver decorator
+# If not using the decorator, connect them here:
+# post_save.connect(handle_email_saved, sender=EmailMessage)
+# post_save.connect(update_email_stats, sender=EmailMessage)
+```
+
+## Don't ❌
+
+```python
+# Bad: Signal defined in models.py
+# models.py
+from django.db.models.signals import post_save
+
+def handle_email_saved(sender, instance, **kwargs):
+    pass
+
+post_save.connect(handle_email_saved, sender=EmailMessage)
+
+# Bad: Signal not registered in __init__.py
+# signals/email.py  # Bad: Missing _signal suffix
+from django.db.models.signals import post_save
+
+def handle_email_saved(sender, instance, **kwargs):
+    pass
+
+# Bad: Connecting signals in random places
+# views.py
+from django.db.models.signals import post_save
+from .signals.email_signal import handle_email_saved  # Bad: Direct import instead of through __init__
+
+post_save.connect(handle_email_saved, sender=EmailMessage)  # Bad: Connection should be in signals/__init__.py
+```
+
+## Guidelines
+
+1. Place new signals in `app/signals/` directory
+2. Each signal module should be in its own file with the suffix `_signal.py` (e.g., `signals/email_signal.py`)
+3. Use the `@receiver` decorator when possible to auto-connect signals
+4. If not using the decorator, connect signals in `signals/__init__.py`
+5. Register all signal handlers in `signals/__init__.py`
+6. Use `__all__` to explicitly define which handlers are exported
+7. Keep signal handlers focused and single-purpose
+8. Document signal handlers with docstrings explaining their purpose 

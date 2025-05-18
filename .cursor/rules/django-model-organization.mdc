@@ -1,0 +1,54 @@
+---
+description:
+globs:
+  - "*/models/*.py"
+  - "*/models/__init__.py"
+alwaysApply: true
+---
+
+# Django Model Organization
+
+New models go in `app/models/` and must be registered in `__init__.py`.
+
+## Do ✅
+
+```python
+# Good: models/email.py
+from django.db import models
+
+class EmailMessage(models.Model):
+    message_id = models.CharField(max_length=255)
+    # ... rest of model definition
+
+# Good: models/__init__.py
+from .email import EmailMessage
+
+__all__ = ['EmailMessage']
+```
+
+## Don't ❌
+
+```python
+# Bad: Model defined in models.py
+# models.py
+from django.db import models
+
+class EmailMessage(models.Model):
+    message_id = models.CharField(max_length=255)
+    # ... rest of model definition
+
+# Bad: Model not registered in __init__.py
+# models/email.py
+from django.db import models
+
+class EmailMessage(models.Model):
+    message_id = models.CharField(max_length=255)
+    # ... rest of model definition
+```
+
+## Guidelines
+
+1. Place new models in `app/models/` directory
+2. Each model should be in its own file (e.g., `models/email.py`)
+3. Register all models in `models/__init__.py`
+4. Use `__all__` to explicitly define which models are exported 

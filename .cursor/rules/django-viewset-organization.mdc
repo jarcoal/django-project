@@ -1,0 +1,86 @@
+# Django ViewSet Organization
+
+New ViewSets go in `app/viewsets/` and must be registered in `__init__.py`. Each viewset file should have the suffix `_viewset.py`. ViewSets must then be imported and configured in `urls.py` using a DRF Router.
+
+## Do ✅
+
+```python
+# Good: viewsets/email_viewset.py
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from app.models import EmailMessage
+from app.serializers import EmailMessageSerializer
+
+class EmailMessageViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing email messages via the API."""
+    permission_classes = [IsAuthenticated]
+    serializer_class = EmailMessageSerializer
+    
+    def get_queryset(self):
+        return EmailMessage.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    @action(detail=True, methods=['post'])
+    def resend(self, request, pk=None):
+        """Custom action to resend an email."""
+        email = self.get_object()
+        email.send()
+        return Response({'status': 'email resent'})
+
+# Good: viewsets/__init__.py
+from .email_viewset import EmailMessageViewSet
+
+__all__ = ['EmailMessageViewSet']
+
+# Good: urls.py
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from app.viewsets import EmailMessageViewSet
+
+router = DefaultRouter()
+router.register('emails', EmailMessageViewSet, basename='api-email')
+
+urlpatterns = [
+    path('api/v1/', include(router.urls)),
+]
+```
+
+## Don't ❌
+
+```python
+# Bad: ViewSet defined in views.py or views/
+# views.py
+from rest_framework import viewsets
+
+class EmailMessageViewSet(viewsets.ModelViewSet):
+    pass
+
+# Bad: ViewSet not registered in __init__.py
+# viewsets/email.py  # Bad: Missing _viewset suffix
+from rest_framework import viewsets
+
+class EmailMessageViewSet(viewsets.ModelViewSet):
+    pass
+
+# Bad: URLs not properly configured
+# urls.py
+from django.urls import path
+from .viewsets.email_viewset import EmailMessageViewSet  # Bad: Direct import instead of through __init__
+
+urlpatterns = [
+    path('api/emails/', EmailMessageViewSet.as_view({'get': 'list'})),  # Bad: Manual ViewSet URL configuration
+]
+```
+
+## Guidelines
+
+1. Place new ViewSets in `app/viewsets/` directory
+2. Each ViewSet module should be in its own file with the suffix `_viewset.py` (e.g., `viewsets/email_viewset.py`)
+3. Register all ViewSets in `viewsets/__init__.py`
+4. Use `__all__` to explicitly define which ViewSets are exported
+5. Import ViewSets from the viewsets package in `urls.py` (e.g., `from app.viewsets import EmailMessageViewSet`)
+6. Always use a DRF Router to configure ViewSet URLs
+7. Place API URLs under an `/api/v1/` prefix for proper versioning 
