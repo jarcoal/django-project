@@ -9,47 +9,49 @@ New Model admins go in `app/admin/` and must be registered in `__init__.py`.
 
 ## Do ✅
 
-```pyapp
-# Good: admin/email.py
+```python
+# Good: admin/product.py
 from django.contrib import admin
-from app.models import EmailMessage
+from app.models import Product
 
-@admin.register(EmailMessage)
-class EmailMessageAdmin(admin.ModelAdmin):
-    list_display = ['message_id', 'sender']
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ['name', 'unit_price', 'supplier']
+    list_filter = ['category']
+    search_fields = ['name']
     # ... rest of admin definition
 
 # Good: admin/__init__.py
-from .email import EmailMessageAdmin
+from .product import ProductAdmin
 
-__all__ = ['EmailMessageAdmin']
+__all__ = ['ProductAdmin']
 ```
 
 ## Don't ❌
 
 ```python
-# Badappfined in admin.py
+# Bad: defined in admin.py
 # admin.py
 from django.contrib import admin
-from app.models import EmailMessage
+from app.models import Product
 
-@admin.register(EmailMessage)
-class EmailMessageAdmin(admin.ModelAdmin):
-    list_display = ['message_id', 'sender']
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ['name', 'unit_price']
 
-# Badappt registered in __init__.py
-# admin/email.py
+# Bad: not registered in __init__.py
+# admin/product.py
 from django.contrib import admin
-from app.models import EmailMessage
+from app.models import Product
 
-@admin.register(EmailMessage)
-class EmailMessageAdmin(admin.ModelAdmin):
-    list_display = ['message_id', 'sender']
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ['name', 'unit_price']
 ```
-app
+
 ## Guidelines
 
 1. Place new model admins in `app/admin/` directory
-2. Each model admin should be in its own file (e.g., `admin/email.py`)
+2. Each model admin should be in its own file (e.g., `admin/product.py`)
 3. Register all model admins in `admin/__init__.py`
 4. Use `__all__` to explicitly define which model admins are exported 

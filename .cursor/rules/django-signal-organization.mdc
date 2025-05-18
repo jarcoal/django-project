@@ -10,32 +10,39 @@ New signals go in `app/signals/` and must be registered in `__init__.py`. Each s
 ## Do ✅
 
 ```python
-# Good: signals/email_signal.py
+# Good: signals/order_signal.py
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from app.models import EmailMessage
+from app.models import Order
+from app.tasks import process_order
 
-@receiver(post_save, sender=EmailMessage)
-def handle_email_saved(sender, instance, created, **kwargs):
-    """Handle post-save signal for EmailMessage model."""
+@receiver(post_save, sender=Order)
+def handle_order_created(sender, instance, created, **kwargs):
+    """Handle post-save signal for Order model."""
     if created:
-        instance.send_notification()
+        # Queue order processing task
+        process_order.delay(instance.id)
 
-@receiver(post_save, sender=EmailMessage)
-def update_email_stats(sender, instance, **kwargs):
-    """Update email statistics after save."""
-    instance.update_stats()
+@receiver(post_save, sender=Order)
+def update_inventory(sender, instance, **kwargs):
+    """Update inventory statistics after order save."""
+    if instance.status == 'COMPLETED':
+        # Update product inventory levels
+        for item in instance.items.all():
+            product = item.product
+            product.units_in_stock -= item.quantity
+            product.save(update_fields=['units_in_stock'])
 
 # Good: signals/__init__.py
 from django.apps import AppConfig
-from .email_signal import handle_email_saved, update_email_stats
+from .order_signal import handle_order_created, update_inventory
 
-__all__ = ['handle_email_saved', 'update_email_stats']
+__all__ = ['handle_order_created', 'update_inventory']
 
 # The signal handlers will be automatically connected due to the @receiver decorator
 # If not using the decorator, connect them here:
-# post_save.connect(handle_email_saved, sender=EmailMessage)
-# post_save.connect(update_email_stats, sender=EmailMessage)
+# post_save.connect(handle_order_created, sender=Order)
+# post_save.connect(update_inventory, sender=Order)
 ```
 
 ## Don't ❌
@@ -45,30 +52,30 @@ __all__ = ['handle_email_saved', 'update_email_stats']
 # models.py
 from django.db.models.signals import post_save
 
-def handle_email_saved(sender, instance, **kwargs):
+def handle_order_created(sender, instance, **kwargs):
     pass
 
-post_save.connect(handle_email_saved, sender=EmailMessage)
+post_save.connect(handle_order_created, sender=Order)
 
 # Bad: Signal not registered in __init__.py
-# signals/email.py  # Bad: Missing _signal suffix
+# signals/order.py  # Bad: Missing _signal suffix
 from django.db.models.signals import post_save
 
-def handle_email_saved(sender, instance, **kwargs):
+def handle_order_created(sender, instance, **kwargs):
     pass
 
 # Bad: Connecting signals in random places
 # views.py
 from django.db.models.signals import post_save
-from .signals.email_signal import handle_email_saved  # Bad: Direct import instead of through __init__
+from .signals.order_signal import handle_order_created  # Bad: Direct import instead of through __init__
 
-post_save.connect(handle_email_saved, sender=EmailMessage)  # Bad: Connection should be in signals/__init__.py
+post_save.connect(handle_order_created, sender=Order)  # Bad: Connection should be in signals/__init__.py
 ```
 
 ## Guidelines
 
 1. Place new signals in `app/signals/` directory
-2. Each signal module should be in its own file with the suffix `_signal.py` (e.g., `signals/email_signal.py`)
+2. Each signal module should be in its own file with the suffix `_signal.py` (e.g., `signals/order_signal.py`)
 3. Use the `@receiver` decorator when possible to auto-connect signals
 4. If not using the decorator, connect signals in `signals/__init__.py`
 5. Register all signal handlers in `signals/__init__.py`
