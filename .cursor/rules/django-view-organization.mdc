@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
 # Django View Organization
 
 New views go in `app/views/` and must be registered in `__init__.py`. Each view file should have the suffix `_view.py`. Views must then be imported and configured in `urls.py`.

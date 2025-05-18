@@ -1,9 +1,8 @@
 ---
-description:
-globs:
-alwaysApply: true
+description: 
+globs: *_tests.py
+alwaysApply: false
 ---
-
 # Avoid setUp and setUpTestData in Tests
 
 When writing tests, prefer creating test data directly within each test method rather than using `setUp` or `setUpTestData`. This approach makes tests more explicit, easier to understand, and reduces hidden dependencies between tests.

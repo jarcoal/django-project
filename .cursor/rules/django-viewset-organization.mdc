@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
 # Django ViewSet Organization
 
 New ViewSets go in `app/viewsets/` and must be registered in `__init__.py`. Each viewset file should have the suffix `_viewset.py`. ViewSets must then be imported and configured in `urls.py` using a DRF Router.

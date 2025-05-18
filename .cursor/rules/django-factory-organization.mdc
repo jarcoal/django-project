@@ -1,11 +1,8 @@
 ---
-description:
-globs:
-  - "*/tests/factories/*_factory.py"
-  - "*/tests/factories/__init__.py"
+description: 
+globs: 
 alwaysApply: true
 ---
-
 # Django Factory Organization
 
 New factories go in `app/tests/factories/` and must be registered in `__init__.py`.

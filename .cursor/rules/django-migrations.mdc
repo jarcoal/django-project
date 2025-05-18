@@ -1,10 +1,8 @@
 ---
-description:
-globs:
-  - "*/migrations/*.py"
+description: 
+globs: 
 alwaysApply: true
 ---
-
 # Django Migrations
 
 Never generate Django migration files, the developer will always handle this.

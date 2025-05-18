@@ -1,11 +1,8 @@
 ---
-description:
-globs:
-  - "*/tasks/*.py"
-  - "*/tasks/__init__.py"
+description: 
+globs: 
 alwaysApply: true
 ---
-
 # Django Task Organization
 
 New Tasks go in `app/tasks/` and must be registered in `__init__.py`.

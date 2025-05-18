@@ -1,10 +1,8 @@
 ---
 description:
 globs:
-  - "*/tests/*_tests.py"
 alwaysApply: true
 ---
-
 # Django Test Organization
 
 New Tests go in `app/tests/` (no registration needed in `__init__.py`).

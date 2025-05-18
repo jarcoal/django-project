@@ -1,10 +1,8 @@
 ---
-description:
-globs:
-  - "*/templates/*.html"
-alwaysApply: true
+description: 
+globs: *.html
+alwaysApply: false
 ---
-
 # Django Template Blocks
 
 Django template blocks must include names: `{% endblock block_name %}`

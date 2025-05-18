@@ -1,11 +1,8 @@
 ---
-description:
-globs:
-  - "*/admin/*.py"
-  - "*/admin/__init__.py"
+description: 
+globs: 
 alwaysApply: true
 ---
-
 # Django Admin Organization
 
 New Model admins go in `app/admin/` and must be registered in `__init__.py`.

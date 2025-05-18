@@ -1,10 +1,8 @@
 ---
-description:
-globs:
-  - "*/admin.py"
-alwaysApply: true
+description: 
+globs: *_admin.py
+alwaysApply: false
 ---
-
 # Django Admin Raw ID Fields
 
 Always use `raw_id_fields` for foreign key fields in Django admin classes that could have many entries to prevent loading large dropdown lists.

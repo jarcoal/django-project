@@ -1,10 +1,8 @@
 ---
-description:
-globs:
-  - "*.py"
-alwaysApply: true
+description: 
+globs: *.py
+alwaysApply: false
 ---
-
 # Python Line Length
 
 Maximum line length is 88 characters for comments and docstrings (Black formatter will handle code).

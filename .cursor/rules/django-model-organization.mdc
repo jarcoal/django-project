@@ -1,11 +1,8 @@
 ---
-description:
-globs:
-  - "*/models/*.py"
-  - "*/models/__init__.py"
+description: 
+globs: 
 alwaysApply: true
 ---
-
 # Django Model Organization
 
 New models go in `app/models/` and must be registered in `__init__.py`.

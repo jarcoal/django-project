@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
 # Django Signal Organization
 
 New signals go in `app/signals/` and must be registered in `__init__.py`. Each signal file should have the suffix `_signal.py`. Signal handlers must be connected to their signals in `__init__.py`.
