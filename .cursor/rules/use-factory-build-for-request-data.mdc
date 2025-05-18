@@ -12,34 +12,35 @@ When testing API endpoints, use `Factory.build()` to generate request data inste
 ```python
 from django.test import TestCase
 from django.urls import reverse
-from app.tests.factories import MessageFactory, ConversationFactory
+from app.tests.factories import ProductFactory, CategoryFactory, SupplierFactory
 
-class MessageAPITests(TestCase):
-    def test_create_message(self):
-        """Test creating a new message via the API."""
+class ProductAPITests(TestCase):
+    def test_create_product(self):
+        """Test creating a new product via the API."""
         # Setup
-        conversation = ConversationFactory()
-        url = reverse('message-create')
+        category = CategoryFactory()
+        supplier = SupplierFactory()
+        url = reverse('product-create')
         
         # Use Factory.build() to generate a model instance
-        message = MessageFactory.build(
-            conversation=conversation,  # Override only what's needed for the test
-            subject="Test Subject"
+        product = ProductFactory.build(
+            category=category,  # Override only what's needed for the test
+            supplier=supplier,
+            unit_price=19.99
         )
         
         # Explicitly construct request data with only the fields we need
-        message_data = {
-            "message_id": message.message_id,
-            "from_address": message.from_address,
-            "to": message.to,
-            "subject": message.subject,
-            "body_plain": message.body_plain,
-            "is_outbound": message.is_outbound,
-            "conversation_id": conversation.id
+        product_data = {
+            "name": product.name,
+            "unit_price": product.unit_price,
+            "units_in_stock": product.units_in_stock,
+            "category_id": category.id,
+            "supplier_id": supplier.id,
+            "discontinued": product.discontinued
         }
         
         # Make the request
-        response = self.client.post(url, data=message_data)
+        response = self.client.post(url, data=product_data)
         self.assertEqual(response.status_code, 201)
 ```
 
@@ -49,28 +50,27 @@ class MessageAPITests(TestCase):
 from django.test import TestCase
 from django.urls import reverse
 
-class MessageAPITests(TestCase):
-    def test_create_message(self):
-        """Test creating a new message via the API."""
+class ProductAPITests(TestCase):
+    def test_create_product(self):
+        """Test creating a new product via the API."""
         # Bad: Manually constructing request data without a factory
-        url = reverse('message-create')
+        url = reverse('product-create')
         data = {
-            "message_id": "test_123",
-            "from_address": "test@example.com",
-            "to": ["recipient@example.com"],
-            "subject": "Test Subject",
-            "body_plain": "Test body",
-            "is_outbound": True,
-            "conversation_id": self.conversation.id  # Brittle reference
+            "name": "Test Product",
+            "unit_price": 19.99,
+            "units_in_stock": 100,
+            "category_id": self.category.id,  # Brittle reference
+            "supplier_id": self.supplier.id,  # Brittle reference
+            "discontinued": False
         }
         response = self.client.post(url, data=data)
 
-    def test_create_message_bad_dict(self):
-        """Test creating a message - BAD: using .__dict__"""
+    def test_create_product_bad_dict(self):
+        """Test creating a product - BAD: using .__dict__"""
         # Bad: Using .__dict__ which may include complex objects
         # or internal Django fields that won't serialize properly
-        message = MessageFactory.build()
-        response = self.client.post(url, data=message.__dict__)
+        product = ProductFactory.build()
+        response = self.client.post(url, data=product.__dict__)
 ```
 
 ## Guidelines

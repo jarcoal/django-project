@@ -11,58 +11,62 @@ When writing tests, prefer creating test data directly within each test method r
 
 ```python
 # Good: Data creation directly in the test
-class TestMessageProcessing(TestCase):
-    def test_message_processing(self):
-        conversation = ConversationFactory()
-        message = MessageFactory(
-            conversation=conversation,
-            message_id="test123",
-            is_outbound=False
+class TestOrderProcessing(TestCase):
+    def test_order_processing(self):
+        supplier = SupplierFactory()
+        product = ProductFactory(
+            supplier=supplier,
+            unit_price=10.00,
+            units_in_stock=100
         )
+        order = OrderFactory(items=[product])
         
-        result = process_message(message)
+        result = process_order(order)
         self.assertEqual(result.status, "processed")
 
-    def test_invalid_message(self):
-        message = MessageFactory(
-            message_id="invalid123",
-            is_outbound=True
+    def test_invalid_order(self):
+        product = ProductFactory(
+            unit_price=10.00,
+            units_in_stock=0  # Out of stock
         )
+        order = OrderFactory(items=[product])
         
         with self.assertRaises(ValidationError):
-            process_message(message)
+            process_order(order)
 ```
 
 ## Don't ❌
 
 ```python
 # Bad: Using setUp for data creation
-class TestMessageProcessing(TestCase):
+class TestOrderProcessing(TestCase):
     def setUp(self):
-        self.conversation = ConversationFactory()
-        self.message = MessageFactory(
-            conversation=self.conversation,
-            message_id="test123"
+        self.supplier = SupplierFactory()
+        self.product = ProductFactory(
+            supplier=self.supplier,
+            unit_price=10.00
         )
+        self.order = OrderFactory(items=[self.product])
     
-    def test_message_processing(self):
-        result = process_message(self.message)
+    def test_order_processing(self):
+        result = process_order(self.order)
         self.assertEqual(result.status, "processed")
     
-    def test_invalid_message(self):
-        self.message.message_id = "invalid123"
+    def test_invalid_order(self):
+        self.product.units_in_stock = 0  # Modifying shared test data!
         with self.assertRaises(ValidationError):
-            process_message(self.message)
+            process_order(self.order)
 
 # Bad: Using setUpTestData for shared data
-class TestMessageProcessing(TestCase):
+class TestOrderProcessing(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.conversation = ConversationFactory()
-        cls.message = MessageFactory(
-            conversation=cls.conversation,
-            message_id="test123"
+        cls.supplier = SupplierFactory()
+        cls.product = ProductFactory(
+            supplier=cls.supplier,
+            unit_price=10.00
         )
+        cls.order = OrderFactory(items=[cls.product])
 ```
 
 ## Guidelines

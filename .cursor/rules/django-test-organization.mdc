@@ -10,19 +10,20 @@ New Tests go in `app/tests/` (no registration needed in `__init__.py`).
 ## Do ✅
 
 ```python
-# Good: tests/email_messages_tests.py
+# Good: tests/products_tests.py
 from django.test import TestCase
-from app.models import EmailMessage
+from app.models import Product
 
-class TestEmailMessage(TestCase):
-    def test_process_inbound_email(self):
-        message = EmailMessage.objects.create(
-            message_id="test123",
-            from_address="test@example.com",
+class TestProduct(TestCase):
+    def test_calculate_inventory_value(self):
+        product = Product.objects.create(
+            name="Test Product",
+            unit_price=10.00,
+            units_in_stock=50
         )
-        self.assertEqual(message.message_id, "test123")
+        self.assertEqual(product.inventory_value(), 500.00)
 
-    def test_another_email_feature(self):
+    def test_another_product_feature(self):
         # ... test implementation
         pass
 ```
@@ -33,26 +34,26 @@ class TestEmailMessage(TestCase):
 # Bad: Tests defined in tests.py
 # tests.py
 from django.test import TestCase
-from app.models import EmailMessage
+from app.models import Product
 
-class TestEmailMessage(TestCase):
-    def test_process_inbound_email(self):
+class TestProduct(TestCase):
+    def test_calculate_inventory_value(self):
         pass
 
 # Bad: Wrong file naming pattern
-# tests/test_email_messages.py
+# tests/test_products.py
 from django.test import TestCase
-from app.models import EmailMessage
+from app.models import Product
 
-class TestEmailMessage(TestCase):
-    def test_process_inbound_email(self):
+class TestProduct(TestCase):
+    def test_calculate_inventory_value(self):
         pass
 ```
 
 ## Guidelines
 
 1. Place new tests in `app/tests/` directory
-2. Each test module should be in its own file (e.g., `tests/email_messages_tests.py`)
+2. Each test module should be in its own file (e.g., `tests/products_tests.py`)
 3. Test files must end with `_tests.py`
 4. No need to register tests in `__init__.py`
 5. Group related tests in the same file 

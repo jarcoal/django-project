@@ -11,28 +11,33 @@ Include clear docstrings for all test methods that explain what the test does.
 
 ```python
 from django.test import TestCase
-from app.models import EmailMessage
+from app.models import Order, Product
 
-class EmailMessageTests(TestCase):
-    def test_process_inbound_email(self):
+class OrderTests(TestCase):
+    def test_process_new_order(self):
         """
-        Test that inbound emails are properly processed:
-        1. Email is parsed correctly
-        2. New conversation is created if no existing thread
-        3. Message is attached to the conversation
+        Test that new orders are properly processed:
+        1. Order is created with correct items
+        2. Inventory levels are updated
+        3. Order status is set to 'Processing'
         """
-        message = EmailMessage.objects.create(
-            message_id="test123",
-            from_address="test@example.com",
+        product = Product.objects.create(
+            name="Test Product",
+            unit_price=10.00,
+            units_in_stock=50
         )
-        self.assertEqual(message.message_id, "test123")
+        order = Order.objects.create(
+            customer_id=1,
+            order_date="2023-01-15"
+        )
+        self.assertEqual(order.status, "Processing")
 
-    def test_reply_to_existing_conversation(self):
+    def test_order_with_insufficient_inventory(self):
         """
-        Test that reply emails are properly threaded:
-        - Should find the parent message by in-reply-to header
-        - Should attach to existing conversation
-        - Should maintain the original subject
+        Test order validation with insufficient inventory:
+        - Should check each product's inventory level
+        - Should reject orders for out-of-stock items
+        - Should provide clear error message about which items are unavailable
         """
         # ... test implementation
         pass
@@ -42,20 +47,25 @@ class EmailMessageTests(TestCase):
 
 ```python
 from django.test import TestCase
-from app.models import EmailMessage
+from app.models import Order, Product
 
-class EmailMessageTests(TestCase):
+class OrderTests(TestCase):
     # Bad: No docstring
-    def test_process_inbound_email(self):
-        message = EmailMessage.objects.create(
-            message_id="test123",
-            from_address="test@example.com",
+    def test_process_new_order(self):
+        product = Product.objects.create(
+            name="Test Product",
+            unit_price=10.00,
+            units_in_stock=50
         )
-        self.assertEqual(message.message_id, "test123")
+        order = Order.objects.create(
+            customer_id=1,
+            order_date="2023-01-15"
+        )
+        self.assertEqual(order.status, "Processing")
 
     # Bad: Vague or unhelpful docstring
-    def test_email_processing(self):
-        """Test email processing."""
+    def test_order_processing(self):
+        """Test order processing."""
         # ... test implementation
         pass
 ```

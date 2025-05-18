@@ -11,22 +11,22 @@ Always use f-strings for string interpolation instead of `.format()` or `%` form
 
 ```python
 # Good: Using f-strings for string interpolation
-def format_message(message):
-    return f"Processing message {message.id} from {message.sender}"
+def format_order_summary(order):
+    return f"Order {order.id} from {order.customer.company_name} totaling ${order.total_amount:.2f}"
 
 # Good: Using f-strings for simple variable interpolation
-def get_status_display(self):
-    return f"Message {self.message_id} is {self.status}"
+def get_product_status(self):
+    return f"Product {self.name} has {self.units_in_stock} units in stock"
 ```
 
 ## Don't ❌
 
 ```python
 # Bad: Using old string formatting
-def format_message(message):
-    return "Processing message %s from %s" % (message.id, message.sender)
+def format_order_summary(order):
+    return "Order %s from %s totaling $%.2f" % (order.id, order.customer.company_name, order.total_amount)
     # or
-    return "Processing message {} from {}".format(message.id, message.sender)
+    return "Order {} from {} totaling ${:.2f}".format(order.id, order.customer.company_name, order.total_amount)
 ```
 
 ## Guidelines

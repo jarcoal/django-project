@@ -9,10 +9,10 @@ alwaysApply: false
 
 1. Always mock task.delay() calls in tests
    ```python
-   @patch('app.tasks.send_email_task.send_email.delay')
+   @patch('app.tasks.order_task.process_order.delay')
    def test_my_view(self, mock_task_delay):
        # Test code here
-       mock_task_delay.assert_called_once_with(recipient='user@example.com')
+       mock_task_delay.assert_called_once_with(order_id=123)
    ```
 
 2. Placement of Mock
@@ -28,14 +28,14 @@ alwaysApply: false
 4. Common Patterns
    ```python
    # Single task call verification
-   mock_task_delay.assert_called_once_with(user_id=1, template_name="welcome")
+   mock_task_delay.assert_called_once_with(order_id=123, notify_customer=True)
 
    # Multiple task calls verification
    self.assertEqual(mock_task_delay.call_count, 3)
    mock_task_delay.assert_has_calls([
-       call(user_id=1, template_name="step1"),
-       call(user_id=1, template_name="step2"),
-       call(user_id=1, template_name="step3")
+       call(product_id=101, restock_quantity=10),
+       call(product_id=102, restock_quantity=5),
+       call(product_id=103, restock_quantity=15)
    ])
 
    # Verifying task was not called
@@ -53,28 +53,34 @@ alwaysApply: false
 from unittest.mock import patch
 from django.test import TestCase
 
-class UserRegistrationViewTests(TestCase):
-    @patch('app.tasks.notification_task.send_slack_notification.delay')
-    @patch('app.tasks.send_email_task.send_email.delay')
-    def test_registration_queues_tasks(self, mock_send_email, mock_slack_notification):
+class OrderCreationViewTests(TestCase):
+    @patch('app.tasks.inventory_task.update_inventory.delay')
+    @patch('app.tasks.order_task.process_order.delay')
+    def test_order_creation_queues_tasks(self, mock_process_order, mock_update_inventory):
         # Arrange
-        user_data = {
-            "email": "new@example.com",
-            "password": "securepass123"
+        order_data = {
+            "customer_id": 5,
+            "products": [
+                {"product_id": 10, "quantity": 2},
+                {"product_id": 15, "quantity": 1}
+            ]
         }
         
         # Act
-        response = self.client.post('/api/register/', user_data)
+        response = self.client.post('/api/orders/', order_data)
         
         # Assert
         self.assertEqual(response.status_code, 201)
-        mock_send_email.assert_called_once_with(
-            recipient=user_data['email'],
-            template_name='welcome_email'
+        order_id = response.json()['id']
+        mock_process_order.assert_called_once_with(
+            order_id=order_id,
+            priority='normal'
         )
-        mock_slack_notification.assert_called_once_with(
-            channel='#new-users',
-            message=f"New user registered: {user_data['email']}"
+        mock_update_inventory.assert_called_once_with(
+            product_adjustments=[
+                {"product_id": 10, "quantity": -2},
+                {"product_id": 15, "quantity": -1}
+            ]
         )
 ```
 
@@ -82,8 +88,8 @@ class UserRegistrationViewTests(TestCase):
 
 1. Import Path
    - Always use the full path: `app.tasks.[task_module].[task_name].delay`
-   - Example: `app.tasks.send_email_task.send_email.delay`
-   - Example: `app.tasks.notification_task.send_slack_notification.delay`
+   - Example: `app.tasks.order_task.process_order.delay`
+   - Example: `app.tasks.inventory_task.update_inventory.delay`
 
 2. Multiple Tasks
    - When mocking multiple tasks, remember decorator order matters

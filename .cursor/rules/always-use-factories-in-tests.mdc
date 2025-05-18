@@ -11,19 +11,19 @@ When writing tests, always use factory classes instead of direct model creation 
 
 ```python
 # Good: Using factories
-conversation = ConversationFactory()
-message = MessageFactory(conversation=conversation)
+supplier = SupplierFactory()
+product = ProductFactory(supplier=supplier)
 
 # Good: Only specifying fields that are important to the test
-message = MessageFactory(
-    message_id="specific-id",  # Important for test logic
-    is_outbound=False,  # Important for test logic
+product = ProductFactory(
+    unit_price=10.00,  # Important for test logic
+    discontinued=False,  # Important for test logic
 )
 
 # Good: Setting related fields directly
-message = MessageFactory(
-    conversation__subject="test",  # Sets subject on the related conversation
-    message_id="specific-id",
+product = ProductFactory(
+    supplier__company_name="Acme Inc",  # Sets company_name on the related supplier
+    unit_price=10.00,
 )
 ```
 
@@ -31,27 +31,29 @@ message = MessageFactory(
 
 ```python
 # Bad: Using direct model creation
-conversation = Conversation.objects.create(
-    project=project,
-    subject="Test Subject",
-    created_at=timezone.now(),
+supplier = Supplier.objects.create(
+    company_name="Acme Inc",
+    contact_name="John Doe",
+    contact_title="Sales Representative",
+    address="123 Main St",
 )
 
 # Bad: Over-specifying factory fields
-message = MessageFactory(
-    message_id="test123",
-    from_address="test@example.com",
-    to=["recipient@example.com"],
-    subject="Test Subject",
-    body_plain="Test body",
-    body_html="<p>Test body</p>",
-    is_outbound=False,
-    created_at=timezone.now(),
+product = ProductFactory(
+    name="Test Product",
+    unit_price=10.00,
+    units_in_stock=100,
+    units_on_order=0,
+    reorder_level=10,
+    discontinued=False,
+    quantity_per_unit="24 boxes",
+    supplier=supplier,
+    category=category,
 )
 
 # Bad: Creating related objects separately
-conversation = ConversationFactory(subject="test")
-message = MessageFactory(conversation=conversation)
+supplier = SupplierFactory(company_name="Acme Inc")
+product = ProductFactory(supplier=supplier)
 ```
 
 ## Guidelines
