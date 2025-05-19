@@ -10,7 +10,7 @@
 	"forwardPorts": [
 		8000
 	],
-	"postCreateCommand": "pipenv install --dev",
+	"postCreateCommand": "./.devcontainer/setup.sh",
 	// List any extensions you want installed when the container is created
 	"customizations": {
 		"vscode": {
